@@ -10,6 +10,7 @@
 var popup = null;
 //var barChart = null;
 
+
 // initialisation function
 function initializeMain()
 {
