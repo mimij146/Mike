@@ -30,6 +30,7 @@ class PracticeData(db.Model):
     practice_name = db.Column(db.Text)
     address_line_1 = db.Column(db.Text)
     address_line_2 = db.Column(db.Text)
+    area = db.Column(db.Text)
     city = db.Column(db.Text)
     county = db.Column(db.Text)
     post_code = db.Column(db.String(10))

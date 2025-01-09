@@ -40,3 +40,16 @@ class Database:
     def get_n_data_for_PCT(self, pct, n):
         """Return all the data for a given PCT."""
         return db.session.query(PrescribingData).filter(PrescribingData.PCT == pct).limit(n).all()
+    
+
+    def get_avg_act(self):
+        """Returns the average ACT cost"""      
+        return round(db.session.execute(db.select(func.avg(PrescribingData.ACT_cost))).first()[0],2)
+    
+    def get_distinct_areas(self):
+        """Returns the total number of areas."""
+        result = db.session.execute(db.select(PracticeData.area).distinct()).all()
+        return len(tuple(self.convert_tuple_list_to_raw(result)))
+
+
+db.session.execute
