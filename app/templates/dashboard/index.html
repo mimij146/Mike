@@ -52,11 +52,19 @@
         <img id="uom-logo" src="{{url_for('static', filename='img/logo-uom.png') }}" />
         <br />
         <hr class="sidebar-divider my-0">
+
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
           <div class="nav-link" onclick="popup.showAboutPopup();">
             <i class="fas fa-info-circle"></i>
             <span>About</span></div>
+        </li>
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+          <div class="nav-link" onclick="popup.showdatasourcesPopup();">
+            <i class="fas fa-info-circle"></i>
+            <span>Data Sources</span></div>
         </li>
 
         <!-- Divider -->
@@ -336,6 +344,21 @@
                   </div>
               </div>
             </div>
+
+              <!-- Data Sources popup -->
+              <div id="datasources-box"> 
+                <div class="card">
+                  <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">Data Sources</h6>
+                    </div>
+                    <div class="card-body">
+                      <p>Data source</p>
+                      <br />
+                      <hr />
+                      <button type="button" class="btn btn-danger" onclick="popup.hidedatasourcesPopup();">Close</button>
+                    </div>
+                </div>
+              </div>
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">

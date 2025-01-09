@@ -13,6 +13,7 @@ function Popup()
     popup.mask = document.getElementById("page-mask");
     popup.entryFormPopup = document.getElementById("creat-calc");
     popup.aboutPopup = document.getElementById("about-box");
+    popup.datasourcesPopup = document.getElementById("datasources-box");
 
     // display the popup mask
     popup.showMask = function()
@@ -58,10 +59,25 @@ function Popup()
         this.aboutPopup.style.display = "none";
     }
 
+    // show the data sources popup
+    popup.showdatasourcesPopup = function()
+    {
+        this.showMask();
+        this.datasourcesPopup.style.display = "block";
+        this.positionDialogue(this.datasourcesPopup);
+    }
+
+    // hide data sources popup
+    popup.hidedatasourcesPopup = function()
+    {
+        this.hideMask();
+        this.datasourcesPopup.style.display = "none";
+    }
+ 
     // position dialogue center screen
     popup.positionDialogue = function(popupBox)
     {
-        popupBox.style.left = (($(document).width() / 2) - (popupBox.offsetWidth / 2)) + "px";
+    popupBox.style.left = (($(document).width() / 2) - (popupBox.offsetWidth / 2)) + "px";
     }
 
     return popup;

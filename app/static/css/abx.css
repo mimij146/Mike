@@ -43,6 +43,16 @@
     z-index:9999;
 }
 
+#datasources-box{
+    position:absolute;
+    top:2%;
+    left:10%;
+    width:45%;
+    height:auto;
+    display: none;
+    z-index:9999;
+}
+
 #input-group-select
 {
     width:30%;
