@@ -9,22 +9,50 @@ DESCRIPTION:   Suite of tests for testing the dashboards database
 """
 
 import unittest
-#from app import app
+from app import app
 from app.database.controllers import Database
 
 class DatabaseTests(unittest.TestCase):
     """Class for testing database functionality and connection."""
     def setUp(self):
         """Run prior to each test."""
+        self.app = app
+        self.app_context = self.app.app_context()
+        self.app_context.push()
         self.db_mod = Database()
+        
+
 
     def tearDown(self):
         """Run post each test."""
-        pass
+        self.app_context.pop()
 
     def test_get_total_number_items(self):
         """Test that the total number of items returns the correct value."""
-        self.assertEquals(self.db_mod.get_total_number_items(), 8218165, 'Test total items returns correct value')
+        
+        self.assertEqual(self.db_mod.get_total_number_items(), 8218165, 'Test total items returns correct value')
+    
+    def test_avg_act(self):
+        """Test that the average ACT function returns the correct value"""
+        self.assertEqual(self.db_mod.get_avg_act(),76.22, 'Test total items returns incorrect value')
+    
+     
+    def test_avg_act(self):
+        """Test that the average ACT function returns the correct value"""
+        self.assertNotEqual(self.db_mod.get_avg_act(),99910)
+
+    
+    def test_unique_areas(self):
+        """Test that the unique areas function returns the correct value"""
+        self.assertEqual(self.db_mod.get_distinct_areas(),2399, 'Test total items returns incorrect value')
+    
+    def test_unique_areas(self):
+        """Test that the unique areas function returns the correct value"""
+        self.assertNotEqual(self.db_mod.get_distinct_areas(),2319998)
+    
+    def non_existing_db_function(self):
+        """Te"""
+        self.assertRaises(self.db_mod.not_existing(),NameError)
 
 if __name__ == "__main__":
     unittest.main()
