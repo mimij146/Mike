@@ -51,5 +51,9 @@ class Database:
         result = db.session.execute(db.select(PracticeData.area).distinct()).all()
         return len(tuple(self.convert_tuple_list_to_raw(result)))
 
+    def get_unique_items(self):
+        """Returns the number of unique items prescribed"""
+        return len(db.session.execute(db.select(PrescribingData.BNF_code).distinct()).all())
+
 
 db.session.execute
