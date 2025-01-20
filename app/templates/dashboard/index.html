@@ -67,6 +67,13 @@
             <span>Data Sources</span></div>
         </li>
 
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+          <div class="nav-link" onclick="popup.showbnfcodesPopup(); "bnf-codes-tooltip="Click for BNF codes info">
+            <i class="fas fa-info-circle"></i>
+            <span>BNF Codes</span></div>
+        </li>
+
         <!-- Divider -->
         <hr class="sidebar-divider">
 
@@ -229,7 +236,7 @@
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">NUMBER OF UNIQUE ITEMS:</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"> {{ dashboard_data.tile_data_items.unique_items }} </div>
                       </div>
                       <div class="col-auto">
                         <i class="fas fa-fingerprint fa-2x text-gray-300"></i>
@@ -238,7 +245,25 @@
                   </div>
                 </div>
               </div>
-          
+
+
+              <!-- Total number GP practice tile -->
+<div class="col-xl-3 col-md-6 mb-4">
+  <div class="card border-left-primary shadow h-100 py-2">
+    <div class="card-body">
+      <div class="row no-gutters align-items-center">
+        <div class="col mr-2">
+          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total no. of GP practice:</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800"> {{ dashboard_data.tile_data_items.total_gp_practice }} </div>
+        </div>
+        <div class="col-auto">
+          <i class="fas fa-hospital fa-2x text-gray-300"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Unique areas tike -->
 <div class="col-xl-3 col-md-6 mb-4">
   <div class="card border-left-primary shadow h-100 py-2">
@@ -272,6 +297,13 @@
                   </div>
                 </div>
               </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
             <!-- Content Row -->
             <div class="row">
@@ -408,6 +440,83 @@
                       <br />
                       <hr />
                       <button type="button" class="btn btn-danger" onclick="popup.hidedatasourcesPopup();">Close</button>
+                    </div>
+                </div>
+              </div>
+
+              <!-- bnf codes popup -->
+              <div id="bnfcodes-box">
+                <div class="card">
+                  <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">BNF Codes Information</h6>
+                    </div>
+                    <div class="card-body">
+                      <p>The NHS Business Services Authority (BSA) prescribing and dispensing information systems use the therapeutic classifications defined in the British National Formulary (BNF) as extended by the BSA.
+                        <br/><br/>This is the BNF code structure for a drug:
+                        <ul>
+                          <li>Characters 1 and 2 show the BNF chapter</li>
+                          <li>Characters 3 and 4 show the BNF section</li>
+                          <li>Characters 5 and 6 show the BNF paragraph</li>
+                          <li>Character 7 shows the BNF sub-paragraph</li>
+                          <li>Characters 8 and 9 show the chemical substance</li>
+                          <li>Characters 10 and 11 show the product</li>
+                          <li>Characters 12 and 13 show the strength and formulation</li>
+                          <li>Characters 14 and 15 show the equivalent</li>
+                      </ul>
+                      For example:
+                      <style>
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            text-align: center;
+                            font-family: Arial, sans-serif;
+                            font-size: 12px;
+                        }
+                        th, td {
+                            border: 1px solid black;
+                            padding: 8px;
+                        }
+                        th {
+                            font-weight: bold;
+                        }
+                    </style>
+                      <table>
+                        <thead>
+                          <br/><tr>
+                                <th>Chapter</th>
+                                <th>Section</th>
+                                <th>Paragraph</th>
+                                <th>Sub para</th>
+                                <th>Chemical<br>substance</th>
+                                <th>Product</th>
+                                <th>Strength/<br>formulation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>04</td>
+                                <td>07</td>
+                                <td>02</td>
+                                <td>0</td>
+                                <td>40</td>
+                                <td>AA</td>
+                                <td>AM</td>
+                            </tr>
+                            <tr>
+                                <td>Central Nervous System</td>
+                                <td>Analgesics</td>
+                                <td>Opioid analgesics</td>
+                                <td>Opioid analgesics</td>
+                                <td>Tramadol hydrochloride</td>
+                                <td>Tramadol HCl</td>
+                                <td>Tramadol HCl_Tab 300mg MR</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                      </p>
+                      <br />
+                      <hr />
+                      <button type="button" class="btn btn-danger" onclick="popup.hidebnfcodesPopup();">Close</button>
                     </div>
                 </div>
               </div>

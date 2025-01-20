@@ -55,6 +55,17 @@ class Database:
         """"Returns total spend on drugs for all practices"""
         total_spend = int(db.session.execute(db.select(func.sum(PrescribingData.items * PrescribingData.ACT_cost))).first()[0])
         return f"{total_spend: ,}"
+    def get_unique_items(self):
+        """Returns the number of unique items prescribed"""
+        return len(db.session.execute(db.select(PrescribingData.BNF_code).distinct()).all())
+
+    def get_total_gp_practice(self):
+        """Returns the total number of GP practices."""
+        result = db.session.execute(db.select(func.count(PracticeData.code))).scalar()
+        return result
+        
+        
+        
 
     def get_top_pct(self):
         """ Get the PCT with the highest count of Gps"""
