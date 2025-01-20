@@ -53,6 +53,10 @@ class DatabaseTests(unittest.TestCase):
     def non_existing_db_function(self):
         """Te"""
         self.assertRaises(self.db_mod.not_existing(),NameError)
+    
+    def test_unique_items(self):
+        self.assertEqual(self.db_mod.get_unique_items(), 13935)
+
 
     def test_total_spend(self):
         """"Test total spend function returns the correct value"""
