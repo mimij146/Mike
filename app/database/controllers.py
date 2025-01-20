@@ -67,4 +67,19 @@ class Database:
         
         
 
+    def get_top_pct(self):
+        """ Get the PCT with the highest count of Gps"""
+        result = db.session.query(
+            PrescribingData.PCT,
+            func.count(func.distinct(PrescribingData.practice)).label('num_practices')
+        ).group_by(PrescribingData.PCT).order_by(
+            func.count(func.distinct(PrescribingData.practice)).desc()
+        ).first()
+
+        # Get the PCT with the highest number of distinct practices and the count itself
+        most_recurring_PCT = result[0] if result else None
+        distinct_practice_count = result[1] if result else 0
+
+        return most_recurring_PCT, distinct_practice_count
+
 db.session.execute
