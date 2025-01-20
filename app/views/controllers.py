@@ -53,6 +53,7 @@ def generate_data_for_tiles():
         "num_unique_items": None,
         "distinct_areas": db_mod.get_distinct_areas(),
         "top_pct": db_mod.get_top_pct(),
+        "total_spend_drugs": db_mod.get_total_spend_drugs(),
     }
     return tile_data
 
