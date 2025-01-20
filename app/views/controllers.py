@@ -51,9 +51,13 @@ def generate_data_for_tiles():
         "avg_act_cost": db_mod.get_avg_act(),
         "top_px_item": None,
         "num_unique_items": None,
-        "distinct_areas": db_mod.get_distinct_areas()
+        "distinct_areas": db_mod.get_distinct_areas(),
+        "total_gp_practice": db_mod.get_total_gp_practice(),
+     
     }
     return tile_data
+
+
 
 def generate_top_px_items_barchart_data():
     """Generate the data needed to populate the number of most prescrbed items per PCT barchart."""
