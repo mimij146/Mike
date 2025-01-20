@@ -6,9 +6,12 @@ DATE:          17/12/2019
 INSTITUTION:   University of Manchester (FBMH)
 DESCRIPTION:   Contains the Database class that contains all the methods used for accessing the database
 """
+from itertools import count
+from typing import Any
 
+from sqlalchemy import Result, CursorResult
 from sqlalchemy.sql import func
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 from app import db
 from app.database.models import PrescribingData, PracticeData
@@ -17,16 +20,16 @@ database = Blueprint('dbutils', __name__, url_prefix='/dbutils')
 
 class Database:
     """Class for managing database queries."""
-    
+
     def convert_tuple_list_to_raw(self, tuple_list):
         """Helper function to convert results from tuple list to plain list."""
         order_row = [tuple(row) for row in tuple_list]
         return  [item for i in order_row for item in i]
-    
+
     def get_total_number_items(self):
         """Return the total number of prescribed items."""
         return int(db.session.execute(db.select(func.sum(PrescribingData.items))).first()[0])
-            
+
     def get_prescribed_items_per_pct(self):
         """Return the total items per PCT."""
         result = db.session.execute(db.select(func.sum(PrescribingData.items).label('item_sum')).group_by(PrescribingData.PCT)).all()
@@ -40,16 +43,30 @@ class Database:
     def get_n_data_for_PCT(self, pct, n):
         """Return all the data for a given PCT."""
         return db.session.query(PrescribingData).filter(PrescribingData.PCT == pct).limit(n).all()
-    
+
 
     def get_avg_act(self):
-        """Returns the average ACT cost"""      
+        """Returns the average ACT cost"""
         return round(db.session.execute(db.select(func.avg(PrescribingData.ACT_cost))).first()[0],2)
-    
+
     def get_distinct_areas(self):
         """Returns the total number of areas."""
         result = db.session.execute(db.select(PracticeData.area).distinct()).all()
         return len(tuple(self.convert_tuple_list_to_raw(result)))
 
+    def get_top_pct(self):
+        """ Get the PCT with the highest count of Gps"""
+        result = db.session.query(
+            PrescribingData.PCT,
+            func.count(func.distinct(PrescribingData.practice)).label('num_practices')
+        ).group_by(PrescribingData.PCT).order_by(
+            func.count(func.distinct(PrescribingData.practice)).desc()
+        ).first()
+
+        # Get the PCT with the highest number of distinct practices and the count itself
+        most_recurring_PCT = result[0] if result else None
+        distinct_practice_count = result[1] if result else 0
+
+        return most_recurring_PCT, distinct_practice_count
 
 db.session.execute

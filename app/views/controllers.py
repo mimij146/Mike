@@ -51,7 +51,8 @@ def generate_data_for_tiles():
         "avg_act_cost": db_mod.get_avg_act(),
         "top_px_item": None,
         "num_unique_items": None,
-        "distinct_areas": db_mod.get_distinct_areas()
+        "distinct_areas": db_mod.get_distinct_areas(),
+        "top_pct": db_mod.get_top_pct(),
     }
     return tile_data
 
