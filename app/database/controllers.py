@@ -51,6 +51,10 @@ class Database:
         result = db.session.execute(db.select(PracticeData.area).distinct()).all()
         return len(tuple(self.convert_tuple_list_to_raw(result)))
 
+    def get_total_spend_drugs(self):
+        """"Returns total spend on drugs for all practices"""
+        total_spend = int(db.session.execute(db.select(func.sum(PrescribingData.items * PrescribingData.ACT_cost))).first()[0])
+        return f"{total_spend: ,}"
     def get_unique_items(self):
         """Returns the number of unique items prescribed"""
         return len(db.session.execute(db.select(PrescribingData.BNF_code).distinct()).all())

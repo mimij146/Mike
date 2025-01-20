@@ -58,5 +58,13 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(self.db_mod.get_unique_items(), 13935)
 
 
+    def test_total_spend(self):
+        """"Test total spend function returns the correct value"""
+        result = self.db_mod.get_total_spend_drugs()
+        if isinstance(result, str):
+            result = int(result.replace(",", ""))
+        self.assertEqual(result, 2596402159)
+
+
 if __name__ == "__main__":
     unittest.main()
