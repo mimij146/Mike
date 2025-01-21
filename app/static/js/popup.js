@@ -14,6 +14,7 @@ function Popup()
     popup.entryFormPopup = document.getElementById("creat-calc");
     popup.aboutPopup = document.getElementById("about-box");
     popup.datasourcesPopup = document.getElementById("datasources-box");
+    popup.bnfcodesPopup = document.getElementById("bnfcodes-box");
 
     // display the popup mask
     popup.showMask = function()
@@ -73,6 +74,21 @@ function Popup()
         this.hideMask();
         this.datasourcesPopup.style.display = "none";
     }
+
+     // show the bnf codes popup
+     popup.showbnfcodesPopup = function()
+     {
+         this.showMask();
+         this.bnfcodesPopup.style.display = "block";
+         this.positionDialogue(this.bnfcodesPopup);
+     }
+ 
+     // hide bnf codes popup
+     popup.hidebnfcodesPopup = function()
+     {
+         this.hideMask();
+         this.bnfcodesPopup.style.display = "none";
+     }
  
     // position dialogue center screen
     popup.positionDialogue = function(popupBox)

@@ -52,9 +52,15 @@ def generate_data_for_tiles():
         "top_px_item": None,
         "num_unique_items": None,
         "distinct_areas": db_mod.get_distinct_areas(),
+        "top_pct": db_mod.get_top_pct(),
         "total_spend_drugs": db_mod.get_total_spend_drugs(),
+        "unique_items": db_mod.get_unique_items(),
+        "total_gp_practice": db_mod.get_total_gp_practice(),
+     
     }
     return tile_data
+
+
 
 def generate_top_px_items_barchart_data():
     """Generate the data needed to populate the number of most prescrbed items per PCT barchart."""

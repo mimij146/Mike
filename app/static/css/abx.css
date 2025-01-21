@@ -53,6 +53,16 @@
     z-index:9999;
 }
 
+#bnfcodes-box{
+    position:absolute;
+    top:2%;
+    left:10%;
+    width:45%;
+    height:auto;
+    display: none;
+    z-index:9999;
+}
+
 #input-group-select
 {
     width:30%;
@@ -114,5 +124,32 @@
 }
 
 .nav-link[data-source-tooltip]:hover::after {
+    opacity: 1;
+}
+
+#tooltip bnf codes
+.nav.link {
+    position:relative;
+    cursor:pointer
+}
+.nav-link[bnf-codes-tooltip]:hover::after {
+    content: attr(bnf-codes-tooltip);
+    position: absolute;
+    bottom: 25%;
+    left: 98%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-size: 12px;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.nav-link[bnf-codes-tooltip]:hover::after {
     opacity: 1;
 }
