@@ -64,6 +64,9 @@ class DatabaseTests(unittest.TestCase):
         if isinstance(result, str):
             result = int(result.replace(",", ""))
         self.assertEqual(result, 2596402159)
+    
+    def test_total_gp_practice(self):
+        self.assertEqual(self.db_mod.get_total_gp_practice(), 9348)
 
     def test_get_top_pct(self):
         """Test get_top_pct function returns the correct values"""
