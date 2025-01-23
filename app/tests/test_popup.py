@@ -60,5 +60,6 @@ class TestPopupButton(unittest.TestCase):
         # Close the WebDriver
         self.driver.quit()
 
+def
 if __name__ == "__main__":
     unittest.main()
