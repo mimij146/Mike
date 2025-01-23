@@ -28,8 +28,8 @@ http://127.0.0.1:5000/dashboard/home/
 
 
 ## Further Info
-For more information, please contact: ...
+For more information, please contact: rmhiicj@ucl.ac.uk
 <br>
 *Last updated: 22/01/2025*
 <br>
-*README Version:* 1.0
+*README Version:* 1.1
