@@ -64,7 +64,14 @@ class Database:
         result = db.session.execute(db.select(func.count(PracticeData.code))).scalar()
         return result
         
+    def get_max_qantity_name_percent(self):
+        """Return the drug name with the highest quantity prescribed and its percentage proportion of total drug quantities"""
+        total_quantity = int(db.session.query(func.sum(PrescribingData.quantity)).scalar())
+        #db.session.execute(db.select(func.sum(PrescribingData.quantity))).first()[0]
+        top_drug_name = db.session.query(PrescribingData.BNF_name).order_by((PrescribingData.quantity).desc()).first()
+        top_drug_amount = int(db.session.query(func.max(PrescribingData.quantity)).first()[0])
         
+        return top_drug_name, total_quantity, top_drug_amount
         
 
     def get_top_pct(self):
