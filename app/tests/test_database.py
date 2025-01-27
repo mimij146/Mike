@@ -64,6 +64,38 @@ class DatabaseTests(unittest.TestCase):
         if isinstance(result, str):
             result = int(result.replace(",", ""))
         self.assertEqual(result, 2596402159)
+    
+    def test_total_gp_practice(self):
+        self.assertEqual(self.db_mod.get_total_gp_practice(), 9348)
+
+    def test_get_top_pct(self):
+        """Test get_top_pct function returns the correct values"""
+        result = self.db_mod.get_top_pct()
+
+        # Unpacking the result
+        most_recurring_PCT, distinct_practice_count = result
+
+        # Expected values (replace with expected test values)
+        expected_pct = "00T"  # Replace with actual expected PCT code
+        expected_count = 61  # Replace with actual expected count
+
+            # Assertions
+        self.assertEqual(most_recurring_PCT, expected_pct, 'Most recurring PCT is incorrect')
+        self.assertEqual(distinct_practice_count, expected_count, 'Distinct practice count is incorrect')
+
+    def test_get_top_pct(self):
+        """Test that get_top_pct function does not return incorrect values"""
+        result = self.db_mod.get_top_pct()
+
+        # Unpacking the result
+        most_recurring_PCT, distinct_practice_count = result
+
+        # Values that should not be returned (replace with incorrect test values)
+        incorrect_pct = "12F"
+        incorrect_count = 70
+
+        self.assertNotEqual(most_recurring_PCT, incorrect_pct, "Most recurring PCT should not be XYZ123")
+        self.assertNotEqual(distinct_practice_count, incorrect_count, "Distinct practice count should not be 99999")
 
 
 if __name__ == "__main__":
