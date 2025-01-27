@@ -76,7 +76,10 @@
 #tooltip
 .nav.link {
     position:relative;
-    cursor:pointer
+    cursor:pointer;
+}
+.hoverable {
+    cursor: pointer;
 }
 .nav-link[data-tooltip]:hover::after {
     content: attr(data-tooltip);
@@ -105,6 +108,11 @@
     position:relative;
     cursor:pointer
 }
+
+.hoverable {
+    cursor: pointer;
+}
+
 .nav-link[data-source-tooltip]:hover::after {
     content: attr(data-source-tooltip);
     position: absolute;
@@ -131,6 +139,9 @@
 .nav.link {
     position:relative;
     cursor:pointer
+}
+.hoverable {
+    cursor: pointer;
 }
 .nav-link[bnf-codes-tooltip]:hover::after {
     content: attr(bnf-codes-tooltip);
