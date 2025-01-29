@@ -64,6 +64,12 @@ class DatabaseTests(unittest.TestCase):
         if isinstance(result, str):
             result = int(result.replace(",", ""))
         self.assertEqual(result, 2596402159)
+    
+    def top_percent_tile_drug_name(self):
+        self.assertEqual(self.db_mod.get_max_qantity_name_percent()[0], "Methadone HCl_Oral Soln 1mg/1ml S/F")
+    
+    def top_percent_tile_percentage(self):
+        self.assertEqual((round(self.db_mod.get_max_qantity_name_percent()[1] / self.db_mod.get_max_qantity_name_percent()[1] *100, 2)), 0.14)
 
 
 if __name__ == "__main__":
