@@ -63,9 +63,7 @@ class Database:
         """Returns the total number of GP practices."""
         result = db.session.execute(db.select(func.count(PracticeData.code))).scalar()
         return result
-        
-        
-        
+
 
     def get_top_pct(self):
         """ Get the PCT with the highest count of Gps"""
@@ -81,5 +79,32 @@ class Database:
         distinct_practice_count = result[1] if result else 0
 
         return most_recurring_PCT, distinct_practice_count
+
+    def get_top_5_antidepressants(self):
+        """Returns the top 5 prescribed antidepressant names along with their quantities."""
+        subquery = db.session.query(
+            PrescribingData.BNF_name,
+            func.sum(PrescribingData.quantity).label('total_quantity')
+        ).filter(
+            PrescribingData.BNF_code.like('0403%'),
+            ~PrescribingData.BNF_name.like('Amitrip%')
+        ).group_by(PrescribingData.BNF_name).subquery()
+
+        result = db.session.query(subquery.c.BNF_name, subquery.c.total_quantity) \
+            .order_by(subquery.c.total_quantity.desc()) \
+            .limit(5).all()
+
+        # Debugging: Print the result
+        print("Top 5 antidepressants:", result)
+
+        # Extract names and quantities
+        BNF_names = [row.BNF_name for row in result]
+        quantities = [row.total_quantity for row in result]
+
+        return BNF_names, quantities
+
+
+
+
 
 db.session.execute
