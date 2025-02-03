@@ -11,6 +11,7 @@ DESCRIPTION:   Suite of tests for testing the dashboards database
 import unittest
 from app import app
 from app.database.controllers import Database
+import plotly.graph_objects as go
 
 class DatabaseTests(unittest.TestCase):
     """Class for testing database functionality and connection."""

@@ -94,8 +94,6 @@ class Database:
             .order_by(subquery.c.total_quantity.desc()) \
             .limit(5).all()
 
-        # Debugging: Print the result
-        print("Top 5 antidepressants:", result)
 
         # Extract names and quantities
         BNF_names = [row.BNF_name for row in result]
