@@ -99,5 +99,19 @@ class DatabaseTests(unittest.TestCase):
         self.assertNotEqual(distinct_practice_count, incorrect_count, "Distinct practice count should not be 99999")
 
 
+    def test_top_5_antidep(self):
+        data = [2429020, 2418812, 2394213, 1801482, 847308]
+        labels = ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"]
+        fig = go.Figure(data=[go.Bar(x=labels, y=data)])
+        bar_data = fig.data[0]
+        x_values = list(bar_data.x)
+        y_values = list(bar_data.y)
+
+
+        self.assertEqual(x_values, labels)
+        self.assertEqual(y_values, data)
+
+
+
 if __name__ == "__main__":
     unittest.main()
