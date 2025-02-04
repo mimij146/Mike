@@ -31,15 +31,26 @@
           $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
 
           // Run JavaScript functions when page ready
-          $(document).ready(function () {
-              initializeMain();
-              var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
-              Plotly.plot('chart',graphs,{});    
-          });
+       $(document).ready(function () {
+    initializeMain();
+
+    // Initialize Plotly chart
+    var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
+    Plotly.plot('chart', graphs, {});
+
+     var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
+    Plotly.plot('antidep_chart', antidep_graphs, {});
+
+});
+
     </script>
   </head>
 
   <body id="page-top">
+
+  <script>
+    var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
+</script>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -320,10 +331,8 @@
                   </div>
                 </div>
               </div>
-                <!-- Content Column -->
-              <div class="col-xl-6">
 
-                <!-- Infection treatment drugs -->
+                    <!-- Infection treatment drugs -->
                 <div class="card shadow mb-4">
                   <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Infection treatment drug as % of all infection treatments</h6>
@@ -333,6 +342,24 @@
                 </div>
               </div>
             </div>
+
+                <!-- Content Column -->
+               <div class="row">
+                    <div class="col-xl-6 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_5_antidepressant_data.header}}</h6>
+                                    </div>
+                                <div class="card-body" id="antidep_chart_container">
+                                    <div id="antidep_chart"></div>
+                                    <p>{{dashboard_data.top_5_antidepressant_data.description}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+
+
 
             <!-- Content Row -->
             <div class="row last-row">

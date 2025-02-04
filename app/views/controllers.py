@@ -12,7 +12,7 @@ import json
 import plotly
 import plotly.express as px
 import pandas as pd
-from flask import Blueprint, render_template, request,jsonify
+from flask import Blueprint, render_template, request, jsonify
 from app.database.controllers import Database
 
 views = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -38,7 +38,8 @@ def home():
         "tile_data_items": generate_data_for_tiles(),  
         "top_items_plot_data": generate_top_px_items_barchart_data(),
         "pct_list": pcts,
-        "pct_data": selected_pct_data
+        "pct_data": selected_pct_data,
+        "top_5_antidepressant_data": generate_top_5_antidepressants_barchart_data()
     }
     
     # render the HTML page passing in relevant data
@@ -85,4 +86,39 @@ def generate_top_px_items_barchart_data():
         'description': description
     }
     return plot_data
+
+def generate_top_5_antidepressants_barchart_data():
+    """Generate the data needed to populate the top 5 prescribed antidepressants across all PCTs."""
+
+    # Fetch data
+    top_names, top_quantities = db_mod.get_top_5_antidepressants()
+
+    # Debugging: Print the data to check for errors
+    print("Names:", top_names)
+    print("Quantities:", top_quantities)
+
+    # Create DataFrame
+    df = pd.DataFrame({
+        "chart_names": top_names,
+        "chart_quantities": top_quantities
+    })
+
+    # Sort data manually in descending order
+    df = df.sort_values(by="chart_quantities", ascending=False)
+
+    # Generate the plot
+    fig = px.bar(df, x="chart_names", y="chart_quantities",
+                 labels={"chart_names": "Medication", "chart_quantities": "Quantity"})
+
+    fig.update_xaxes(categoryorder="total descending")  # Ensure correct ordering
+
+    # Convert the plot to JSON
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return {
+        'graphJSON': graphJSON,
+        'header': "Top 5 Prescribed Antidepressants",
+        'description': "Top 5 prescribed antidepressants across all PCTs with their quantities."
+    }
+
 

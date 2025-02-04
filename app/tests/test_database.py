@@ -11,6 +11,7 @@ DESCRIPTION:   Suite of tests for testing the dashboards database
 import unittest
 from app import app
 from app.database.controllers import Database
+import plotly.graph_objects as go
 
 class DatabaseTests(unittest.TestCase):
     """Class for testing database functionality and connection."""
@@ -96,6 +97,20 @@ class DatabaseTests(unittest.TestCase):
 
         self.assertNotEqual(most_recurring_PCT, incorrect_pct, "Most recurring PCT should not be XYZ123")
         self.assertNotEqual(distinct_practice_count, incorrect_count, "Distinct practice count should not be 99999")
+
+
+    def test_top_5_antidep(self):
+        data = [2429020, 2418812, 2394213, 1801482, 847308]
+        labels = ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"]
+        fig = go.Figure(data=[go.Bar(x=labels, y=data)])
+        bar_data = fig.data[0]
+        x_values = list(bar_data.x)
+        y_values = list(bar_data.y)
+
+
+        self.assertEqual(x_values, labels)
+        self.assertEqual(y_values, data)
+
 
 
 if __name__ == "__main__":
