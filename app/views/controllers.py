@@ -38,7 +38,8 @@ def home():
         "tile_data_items": generate_data_for_tiles(),  
         "top_items_plot_data": generate_top_px_items_barchart_data(),
         "pct_list": pcts,
-        "pct_data": selected_pct_data
+        "pct_data": selected_pct_data,
+        "infection_treatment_plot_data": generate_infection_treatment_barchart_data()
     }
     
     # render the HTML page passing in relevant data
@@ -85,4 +86,35 @@ def generate_top_px_items_barchart_data():
         'description': description
     }
     return plot_data
+
+import json
+def generate_infection_treatment_barchart_data():
+    infection_data = db_mod.get_infection_treatment_barchart()
+    categories = [item[0] for item in infection_data]
+    percentages = [item[1] for item in infection_data]
+
+    plot_data = [{
+        "x": categories,
+        "y": percentages,
+        "type": "bar",
+        "name": "Infection Treatments"
+    }]
+
+    layout = {
+        "yaxis": {
+            "title": "Percentage (%)",
+            "range": [0, 100]
+        },
+        "xaxis": {
+            "title": "Drug Categories"
+        },
+    }
+
+    full_plot = {
+        "data": plot_data,
+        "layout": layout
+    }
+
+    return json.dumps(full_plot)
+
 
