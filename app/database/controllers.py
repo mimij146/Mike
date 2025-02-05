@@ -89,4 +89,29 @@ class Database:
 
         return most_recurring_PCT, distinct_practice_count
 
+    def get_top_5_antidepressants(self):
+        """Returns the top 5 prescribed antidepressant names along with their quantities."""
+        subquery = db.session.query(
+            PrescribingData.BNF_name,
+            func.sum(PrescribingData.quantity).label('total_quantity')
+        ).filter(
+            PrescribingData.BNF_code.like('0403%'),
+            ~PrescribingData.BNF_name.like('Amitrip%')
+        ).group_by(PrescribingData.BNF_name).subquery()
+
+        result = db.session.query(subquery.c.BNF_name, subquery.c.total_quantity) \
+            .order_by(subquery.c.total_quantity.desc()) \
+            .limit(5).all()
+
+
+        # Extract names and quantities
+        BNF_names = [row.BNF_name for row in result]
+        quantities = [row.total_quantity for row in result]
+
+        return BNF_names, quantities
+
+
+
+
+
 db.session.execute

@@ -31,15 +31,26 @@
           $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
 
           // Run JavaScript functions when page ready
-          $(document).ready(function () {
-              initializeMain();
-              var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
-              Plotly.plot('chart',graphs,{});    
-          });
+       $(document).ready(function () {
+    initializeMain();
+
+    // Initialize Plotly chart
+    var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
+    Plotly.plot('chart', graphs, {});
+
+     var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
+    Plotly.plot('antidep_chart', antidep_graphs, {});
+
+});
+
     </script>
   </head>
 
   <body id="page-top">
+
+  <script>
+    var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
+</script>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -55,23 +66,30 @@
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-          <div class="nav-link" onclick="popup.showAboutPopup(); "data-tooltip="Click for developer info">
+          <div class="nav-link hoverable" onclick="popup.showAboutPopup(); "data-tooltip="Click for developer info">
             <i class="fas fa-info-circle"></i>
             <span>About</span></div>
         </li>
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-          <div class="nav-link" onclick="popup.showdatasourcesPopup(); "data-source-tooltip="Click for data source info">
+          <div class="nav-link hoverable" onclick="popup.showdatasourcesPopup(); "data-source-tooltip="Click for data source info">
             <i class="fas fa-info-circle"></i>
             <span>Data Sources</span></div>
         </li>
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-          <div class="nav-link" onclick="popup.showbnfcodesPopup(); "bnf-codes-tooltip="Click for BNF codes info">
+          <div class="nav-link hoverable" onclick="popup.showbnfcodesPopup(); "bnf-codes-tooltip="Click for BNF codes info">
             <i class="fas fa-info-circle"></i>
             <span>BNF Codes</span></div>
+        </li>
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+          <div class="nav-link hoverable" onclick="popup.showfaqPopup(); "faq-tooltip="Click for frequenstly asked questions">
+            <i class="fas fa-question-circle"></i>
+            <span>FAQ</span></div>
         </li>
 
         <!-- Divider -->
@@ -281,7 +299,7 @@
   </div>
 </div>
 
-<!-- Total cost tile -->
+<!-- Total spend tile -->
               <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-primary shadow h-100 py-2">
                   <div class="card-body">
@@ -297,11 +315,6 @@
                   </div>
                 </div>
               </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 
@@ -318,10 +331,8 @@
                   </div>
                 </div>
               </div>
-                <!-- Content Column -->
-              <div class="col-xl-6">
 
-                <!-- Infection treatment drugs -->
+                    <!-- Infection treatment drugs -->
                 <div class="card shadow mb-4">
                   <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Infection treatment drug as % of all infection treatments</h6>
@@ -331,6 +342,24 @@
                 </div>
               </div>
             </div>
+
+                <!-- Content Column -->
+               <div class="row">
+                    <div class="col-xl-6 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_5_antidepressant_data.header}}</h6>
+                                    </div>
+                                <div class="card-body" id="antidep_chart_container">
+                                    <div id="antidep_chart"></div>
+                                    <p>{{dashboard_data.top_5_antidepressant_data.description}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+
+
 
             <!-- Content Row -->
             <div class="row last-row">
@@ -520,6 +549,29 @@
                     </div>
                 </div>
               </div>
+
+              <!-- faq popup -->
+            <div id="faq-box">
+              <div class="card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Frequently asked questions</h6>
+                  </div>
+                  <div class="card-body">
+                    <p><strong>Who are the main users of this dashboard?</strong> 
+                      <br> Integrated Care Board members (GPs, nurses, managers)
+                      <br>
+                      <br> <strong>At what level is the data coming from?</strong> 
+                      <br> Practice level
+                      <br>
+                      <br> <strong>What are BNF codes?</strong> 
+                      <br> The BNF (British National Formulary) is the UK's pharmaceutical reference book (also available online) produced by the British Medical Association and Royal Pharmaceutical Society of Great Britain. Each drug has a specific code that refers to a section in the book.
+                    </p>
+                    <br />
+                    <hr />
+                    <button type="button" class="btn btn-danger" onclick="popup.hidefaqPopup();">Close</button>
+                  </div>
+              </div>
+            </div>
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
