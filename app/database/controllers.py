@@ -80,6 +80,35 @@ class Database:
 
         return most_recurring_PCT, distinct_practice_count
 
+
+    def get_infection_treatment_barchart(self):
+        total_items = db.session.query(
+            func.sum(PrescribingData.items)
+        ).filter(
+            PrescribingData.BNF_code.like('050%')
+        ).scalar()
+
+        categories = [
+            ('Antibacterials', '0501%'),
+            ('Antifungal', '0502%'),
+            ('Antiviral', '0503%'),
+            ('Antiprotozoal', '0504%'),
+            ('Anthelmintics', '0505%')
+        ]
+
+        results = []
+        for category, bnf_code in categories:
+            category_total = db.session.query(
+                func.sum(PrescribingData.items)
+            ).filter(
+                PrescribingData.BNF_code.like(bnf_code)
+            ).scalar()
+
+            percentage = (category_total / total_items * 100) if total_items else 0
+            results.append((category, round(percentage, 2)))
+
+        return results
+
     def get_top_5_antidepressants(self):
         """Returns the top 5 prescribed antidepressant names along with their quantities."""
         subquery = db.session.query(
@@ -100,6 +129,7 @@ class Database:
         quantities = [row.total_quantity for row in result]
 
         return BNF_names, quantities
+
 
 
 

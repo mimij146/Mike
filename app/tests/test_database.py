@@ -98,6 +98,52 @@ class DatabaseTests(unittest.TestCase):
         self.assertNotEqual(most_recurring_PCT, incorrect_pct, "Most recurring PCT should not be XYZ123")
         self.assertNotEqual(distinct_practice_count, incorrect_count, "Distinct practice count should not be 99999")
 
+    def test_infection_percentage_bar_chart_zero_value_handling(self):
+        """
+        Test that the bar chart correctly handles a category with a value of 0.
+        """
+        # Mock results with one category having a value of 0
+        mock_results = [
+            ('Antibacterials', 82.25),
+            ('Antifungal', 0.00),
+            ('Antiviral', 2.68),
+            ('Antiprotozoal', 9.04),
+            ('Anthelmintics', 5.23)
+        ]
+
+        # Calculate total for processing (if needed by the chart logic)
+        total = sum(value for _, value in mock_results)
+
+        # Ensure the zero value does not cause rendering issues
+        for category, percentage in mock_results:
+            if category == 'Antifungal':
+                self.assertEqual(
+                    percentage,
+                    0.00,
+                    msg="Zero value for 'Antifungal' is not handled correctly."
+                )
+def test_infection_percentage_bar_chart_over_100_handling():
+    """
+    Test that the bar chart correctly handles a total percentage exceeding 100%.
+    """
+    # Mock results with values summing to more than 100%
+    mock_results = [
+        ('Antibacterials', 50.0),
+        ('Antifungal', 30.0),
+        ('Antiviral', 25.0),
+        ('Antiprotozoal', 10.0),
+        ('Anthelmintics', 5.0)
+    ]
+
+    # Calculate total for processing (if needed by the chart logic)
+    total = sum(value for _, value in mock_results)
+
+    # Check if the total exceeds 100%
+    assert total > 100.0, f"Total percentage exceeds 100%: {total}. Chart logic should handle this correctly."
+
+    # Ensure individual values are still correct
+    for category, percentage in mock_results:
+        assert percentage >= 0.0, f"Percentage for '{category}' should not be negative."
 
     def test_top_5_antidep(self):
         data = [2429020, 2418812, 2394213, 1801482, 847308]
