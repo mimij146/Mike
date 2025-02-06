@@ -138,10 +138,6 @@ def generate_top_5_antidepressants_barchart_data():
     # Fetch data
     top_names, top_quantities = db_mod.get_top_5_antidepressants()
 
-    # Debugging: Print the data to check for errors
-    print("Names:", top_names)
-    print("Quantities:", top_quantities)
-
     # Create DataFrame
     df = pd.DataFrame({
         "chart_names": top_names,
