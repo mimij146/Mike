@@ -31,6 +31,13 @@
           $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
 
           // Run JavaScript functions when page ready
+
+          $(document).ready(function () {
+              initializeMain();
+              var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
+              Plotly.plot('chart',graphs,{});
+          });
+
        $(document).ready(function () {
     initializeMain();
 
@@ -42,6 +49,7 @@
     Plotly.plot('antidep_chart', antidep_graphs, {});
 
 });
+
 
     </script>
   </head>
@@ -338,6 +346,11 @@
                     <h6 class="m-0 font-weight-bold text-primary">Infection treatment drug as % of all infection treatments</h6>
                   </div>
                   <div class="card-body">
+                  <div id="infection-treatments-chart" style="width:100%; height:400px;"></div>
+                  <script>
+                      var infectionTreatmentData = {{ dashboard_data.infection_treatment_plot_data | safe }};
+                      Plotly.newPlot('infection-treatments-chart', infectionTreatmentData);
+                  </script>
                   </div>
                 </div>
               </div>

@@ -39,9 +39,13 @@ def home():
         "top_items_plot_data": generate_top_px_items_barchart_data(),
         "pct_list": pcts,
         "pct_data": selected_pct_data,
+
         "total_quantity": db_mod.get_max_qantity_name_percent()[1],
         "top_drug_amount": db_mod.get_max_qantity_name_percent()[2],
         "top_over_total_percent": round((db_mod.get_max_qantity_name_percent()[2])/ (db_mod.get_max_qantity_name_percent()[1])  * 100,2),     
+
+        "infection_treatment_plot_data": generate_infection_treatment_barchart_data(),
+
         "top_5_antidepressant_data": generate_top_5_antidepressants_barchart_data()
     }
       
@@ -96,6 +100,37 @@ def generate_top_px_items_barchart_data():
         'description': description
     }
     return plot_data
+
+
+import json
+def generate_infection_treatment_barchart_data():
+    infection_data = db_mod.get_infection_treatment_barchart()
+    categories = [item[0] for item in infection_data]
+    percentages = [item[1] for item in infection_data]
+
+    plot_data = [{
+        "x": categories,
+        "y": percentages,
+        "type": "bar",
+        "name": "Infection Treatments"
+    }]
+
+    layout = {
+        "yaxis": {
+            "title": "Percentage (%)",
+            "range": [0, 100]
+        },
+        "xaxis": {
+            "title": "Drug Categories"
+        },
+    }
+
+    full_plot = {
+        "data": plot_data,
+        "layout": layout
+    }
+
+    return json.dumps(full_plot)
 
 def generate_top_5_antidepressants_barchart_data():
     """Generate the data needed to populate the top 5 prescribed antidepressants across all PCTs."""

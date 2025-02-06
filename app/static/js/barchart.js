@@ -177,4 +177,14 @@ function BarChartAntidep()
     }
 
     return barChart;
-}
+}document.addEventListener("DOMContentLoaded", function () {
+    // Instantiate the BarChart class
+    var chart = new BarChart();
+
+    // Get the infection treatment data from the backend
+    var infectionTreatmentData = "{{ infection_treatment_plot_data | safe }}";
+    console.log("Infection Treatment Data:", infectionTreatmentData); // Debugging
+
+    // Render the Infection Treatments Chart
+    chart.renderInfectionTreatments(infectionTreatmentData);
+});
