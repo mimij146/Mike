@@ -66,6 +66,13 @@ class DatabaseTests(unittest.TestCase):
             result = int(result.replace(",", ""))
         self.assertEqual(result, 2596402159)
     
+
+    def top_percent_tile_drug_name(self):
+        self.assertEqual(self.db_mod.get_max_qantity_name_percent()[0], "Methadone HCl_Oral Soln 1mg/1ml S/F")
+    
+    def top_percent_tile_percentage(self):
+        self.assertEqual((round(self.db_mod.get_max_qantity_name_percent()[1] / self.db_mod.get_max_qantity_name_percent()[1] *100, 2)), 0.14)
+
     def test_total_gp_practice(self):
         self.assertEqual(self.db_mod.get_total_gp_practice(), 9348)
 
@@ -156,6 +163,7 @@ def test_infection_percentage_bar_chart_over_100_handling():
 
         self.assertEqual(x_values, labels)
         self.assertEqual(y_values, data)
+
 
 
 

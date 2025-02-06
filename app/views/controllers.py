@@ -39,12 +39,21 @@ def home():
         "top_items_plot_data": generate_top_px_items_barchart_data(),
         "pct_list": pcts,
         "pct_data": selected_pct_data,
+
+        "total_quantity": db_mod.get_max_qantity_name_percent()[1],
+        "top_drug_amount": db_mod.get_max_qantity_name_percent()[2],
+        "top_over_total_percent": round((db_mod.get_max_qantity_name_percent()[2])/ (db_mod.get_max_qantity_name_percent()[1])  * 100,2),     
+
         "infection_treatment_plot_data": generate_infection_treatment_barchart_data(),
+
         "top_5_antidepressant_data": generate_top_5_antidepressants_barchart_data()
     }
-    
+      
+
+
     # render the HTML page passing in relevant data
     return render_template('dashboard/index.html',dashboard_data=dashboard_data)
+    
 
 def generate_data_for_tiles():
     """Generate the data for the four home page tiles."""
@@ -58,7 +67,11 @@ def generate_data_for_tiles():
         "total_spend_drugs": db_mod.get_total_spend_drugs(),
         "unique_items": db_mod.get_unique_items(),
         "total_gp_practice": db_mod.get_total_gp_practice(),
-     
+        "top_quant_drug_name":db_mod.get_max_qantity_name_percent()[0],
+        "total_quantity": db_mod.get_max_qantity_name_percent()[1],
+        "top_drug_amount": db_mod.get_max_qantity_name_percent()[2],
+       
+    
     }
     return tile_data
 
