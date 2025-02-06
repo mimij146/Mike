@@ -12,6 +12,11 @@ import unittest
 from app import app
 from app.database.controllers import Database
 import plotly.graph_objects as go
+from app.views.controllers import generate_top_5_antidepressants_barchart_data
+from unittest.mock import patch
+import plotly.utils
+import pandas as pd
+import json
 
 class DatabaseTests(unittest.TestCase):
     """Class for testing database functionality and connection."""
@@ -111,6 +116,41 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(x_values, labels)
         self.assertEqual(y_values, data)
 
+
+    @patch("app.views.controllers.db_mod.get_top_5_antidepressants")
+    def test_generate_top_5_antidepressants_barchart_data(self, mock_get_top_5):
+
+        mock_get_top_5.return_value = (
+            ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"],
+            [2429020, 2418812, 2394213, 1801482, 847308]
+        )
+
+        result = generate_top_5_antidepressants_barchart_data()
+
+        self.assertIn("graphJSON", result)
+        self.assertIn("header", result)
+        self.assertIn("description", result)
+        self.assertEqual(result["header"], "Top 5 Prescribed Antidepressants")
+        self.assertIn("Top 5 prescribed antidepressants", result["description"])
+
+
+        try:
+            graph_data = json.loads(result["graphJSON"])
+        except ValueError:
+            self.fail("graphJSON is not valid JSON")
+
+        # Check Plotly figure properties
+        self.assertIn("data", graph_data)
+        self.assertIn("layout", graph_data)
+
+        # Ensure sorting is correct
+        df = pd.DataFrame({
+            "chart_names": ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"],
+            "chart_quantities": [2429020, 2418812, 2394213, 1801482, 847308]
+        }).sort_values(by="chart_quantities", ascending=False)
+
+        self.assertListEqual(df["chart_names"].tolist(), ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"])
+        self.assertListEqual(df["chart_quantities"].tolist(), [2429020, 2418812, 2394213, 1801482, 847308])
 
 
 if __name__ == "__main__":
