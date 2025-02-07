@@ -13,6 +13,7 @@ from app import app
 from app.database.controllers import Database
 import plotly.graph_objects as go
 from app.views.controllers import generate_top_5_antidepressants_barchart_data
+from app.views.controllers import generate_infection_treatment_barchart_data
 from unittest.mock import patch
 import plotly.utils
 import pandas as pd
@@ -134,28 +135,28 @@ class DatabaseTests(unittest.TestCase):
                     0.00,
                     msg="Zero value for 'Antifungal' is not handled correctly."
                 )
-def test_infection_percentage_bar_chart_over_100_handling():
-    """
-    Test that the bar chart correctly handles a total percentage exceeding 100%.
-    """
+    def test_infection_percentage_bar_chart_over_100_handling(self):
+        """
+        Test that the bar chart correctly handles a total percentage exceeding 100%.
+        """
     # Mock results with values summing to more than 100%
-    mock_results = [
-        ('Antibacterials', 50.0),
-        ('Antifungal', 30.0),
-        ('Antiviral', 25.0),
-        ('Antiprotozoal', 10.0),
-        ('Anthelmintics', 5.0)
-    ]
+        mock_results = [
+            ('Antibacterials', 50.0),
+            ('Antifungal', 30.0),
+            ('Antiviral', 25.0),
+            ('Antiprotozoal', 10.0),
+            ('Anthelmintics', 5.0)
+        ]
 
     # Calculate total for processing (if needed by the chart logic)
-    total = sum(value for _, value in mock_results)
+        total = sum(value for _, value in mock_results)
 
     # Check if the total exceeds 100%
-    assert total > 100.0, f"Total percentage exceeds 100%: {total}. Chart logic should handle this correctly."
+        assert total > 100.0, f"Total percentage exceeds 100%: {total}. Chart logic should handle this correctly."
 
     # Ensure individual values are still correct
-    for category, percentage in mock_results:
-        assert percentage >= 0.0, f"Percentage for '{category}' should not be negative."
+        for category, percentage in mock_results:
+            assert percentage >= 0.0, f"Percentage for '{category}' should not be negative."
 
     def test_top_5_antidep(self):
         data = [2429020, 2418812, 2394213, 1801482, 847308]
@@ -205,7 +206,25 @@ def test_infection_percentage_bar_chart_over_100_handling():
         self.assertListEqual(df["chart_names"].tolist(), ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"])
         self.assertListEqual(df["chart_quantities"].tolist(), [2429020, 2418812, 2394213, 1801482, 847308])
 
+    @patch("app.views.controllers.db_mod.get_infection_treatment_barchart")
+    def test_infection_percentage_bar_chart_over_100_handling(self, mock_get_data):
+        mock_get_data.return_value = [
+            ("Antibiotics", 50),
+            ("Antivirals", 20),
+            ("Antifungals", 30)
+        ]
 
+
+        result_json = generate_infection_treatment_barchart_data()
+        result = json.loads(result_json)
+
+
+        y_range = result["layout"]["yaxis"]["range"]
+        y_values = result["data"][0]["y"]
+
+
+        self.assertEqual(y_range, [0, 100])
+        self.assertTrue(all(0 <= y <= 100 for y in y_values))
 
 if __name__ == "__main__":
     unittest.main()
