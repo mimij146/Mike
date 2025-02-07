@@ -31,6 +31,7 @@
           $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
 
           // Run JavaScript functions when page ready
+
           $(document).ready(function () {
               initializeMain();
               var graphs = [
@@ -41,6 +42,16 @@
                 Plotly.plot('chart'+index, graphData,{})
             });  
           });
+
+       $(document).ready(function () {
+          initializeMain();
+    // Initialize Plotly chart
+     var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
+    Plotly.plot('antidep_chart', antidep_graphs, {});
+
+});
+
+
     </script>
   </head>
 
@@ -77,6 +88,13 @@
           <div class="nav-link hoverable" onclick="popup.showbnfcodesPopup(); "bnf-codes-tooltip="Click for BNF codes info">
             <i class="fas fa-info-circle"></i>
             <span>BNF Codes</span></div>
+        </li>
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+          <div class="nav-link hoverable" onclick="popup.showfaqPopup(); "faq-tooltip="Click for frequenstly asked questions">
+            <i class="fas fa-question-circle"></i>
+            <span>FAQ</span></div>
         </li>
 
         <!-- Divider -->
@@ -198,7 +216,7 @@
       <div class="row no-gutters align-items-center">
         <div class="col mr-2">
           <div class="text-xs font-weight-bold text-primary text-uppercase mb-1"> Top PCT Code And Number Of Practices: </div>
-          <div class="h5 mb-0 font-weight-bold text-gray-800"> {{ dashboard_data.tile_data_items.top_pct }} </div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800"> {{ dashboard_data.tile_data_items.top_pct[0] }}: {{ dashboard_data.tile_data_items.top_pct[1] }}</div>
         </div>
         <div class="col-auto">
           <i class="fas fa-doctor fa-2x text-gray-300"></i>
@@ -213,15 +231,15 @@
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">TOP PRESCRIBED ITEM:</div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">TOP PRESCRIBED ITEM: {{ dashboard_data.tile_data_items.top_quant_drug_name[0] }}</div>
                         <span class="text_col_black"></span>
                         <div class="row no-gutters align-items-center">
                           <div class="col-auto">
-                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">%</div>
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"> {{ dashboard_data.top_over_total_percent }} %</div>
                           </div>
                           <div class="col">
                             <div class="progress progress-sm mr-2">
-                              <div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                              <div class="progress-bar bg-info" role="progressbar" style="width:{{ dashboard_data.top_over_total_percent }}%" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                           </div>
                         </div>
@@ -306,7 +324,7 @@
 
 
               <!-- Content Row -->
-              <div class="row d-flex align-items-stretch">
+         <div class="row d-flex align-items-stretch">
                 <div class="col-xl-6 col-lg-7 d-flex">
                   <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -320,41 +338,63 @@
                   </div>
                  </div>
                 </div>
-                <!-- Content Column -->
+                  <!-- Content Column -->
                 <div class="col-xl-6 col-lg-7 d-flex">
-                  <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                      <h6 class="m-0 font-weight-bold text-primary">Infection treatment drug as % of all infection treatments</h6>
-                    </div>
-                    <div class="card-body">
-                     <div class="row no-gutters align-items-center" >
-                     </div>
-                    </div>
+                    <!-- Infection treatment drugs -->
+                 <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Infection treatment drug as % of all infection treatments</h6>
                   </div>
-                </div>
-              </div>
-
-            <!-- Content Row -->
-            <div class="row last-row d-flex align-items-stretch">
-              <div class="col-xl-6 col-lg-7 d-flex">
-                <div class="card shadow mb-4">
-                  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.total_spend_plot_data.header}}</h6>
-                  </div>
-                  <div class="card-body d-flex flex-column">
+                  <div class="card-body">
                     <div class="row no-gutters align-items-center" >
-                      <div id="chart1" class="chart"></div>
-                      <p>{{dashboard_data.total_spend_plot_data.description}}</p> 
-                    </div>                   
+                      <div id="infection-treatments-chart" style="width:100%; height:400px;"></div>
+                      <script>
+                        var infectionTreatmentData = {{ dashboard_data.infection_treatment_plot_data | safe }};
+                        Plotly.newPlot('infection-treatments-chart', infectionTreatmentData);
+                      </script>
+                   </div>
+                 </div>
+               </div>
+
+                <!-- ContentRow -->
+              <div class="row d-flex align-items-stretch">
+                   <div class="col-xl-6 col-lg-7 d-flex">
+                       <div class="card shadow mb-4">
+                           <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                               <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_5_antidepressant_data.header}}</h6>
+                           </div>
+                           <div class="card-body" id="antidep_chart_container">
+                           <div class="row no-gutters align-items-center"> 
+                              <div id="antidep_chart"></div>
+                              <p>{{dashboard_data.top_5_antidepressant_data.description}}</p>
+                           </div>
+                          </div>
+                        </div>
+                 </div>
+
+            <!-- Content Column -->
+                 <div class="col-xl-6 col-lg-7 d-flex">
+                  <div class="col-xl-6 col-lg-7 d-flex">
+                    <div class="card shadow mb-4">
+                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.total_spend_plot_data.header}}</h6>
+                      </div>
+                      <div class="card-body d-flex flex-column">
+                        <div class="row no-gutters align-items-center" >
+                          <div id="chart1" class="chart"></div>
+                          <p>{{dashboard_data.total_spend_plot_data.description}}</p> 
+                        </div>                   
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
   
-              <!-- Content Column -->
+              <!-- Content Row -->
+            <div class="row last-row d-flex align-items-stretch">
              <div class="col-xl-6 col-lg-7 d-flex">
                   <!-- Show the BNF data for slected PCT -->
               <div class="card shadow mb-4">
-                <div class="card-header py-3">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <h6 class="m-0 font-weight-bold text-primary">BNF data per PCT</h6>
                 </div>
                 <div class="card-body">
@@ -534,7 +574,29 @@
                         <button type="button" class="btn btn-danger" onclick="popup.hidebnfcodesPopup();">Close</button>
                       </div>
                   </div>
-                </div>
+                  
+              <!-- faq popup -->
+            <div id="faq-box">
+              <div class="card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Frequently asked questions</h6>
+                  </div>
+                  <div class="card-body">
+                    <p><strong>Who are the main users of this dashboard?</strong> 
+                      <br> Integrated Care Board members (GPs, nurses, managers)
+                      <br>
+                      <br> <strong>At what level is the data coming from?</strong> 
+                      <br> Practice level
+                      <br>
+                      <br> <strong>What are BNF codes?</strong> 
+                      <br> The BNF (British National Formulary) is the UK's pharmaceutical reference book (also available online) produced by the British Medical Association and Royal Pharmaceutical Society of Great Britain. Each drug has a specific code that refers to a section in the book.
+                    </p>
+                    <br />
+                    <hr />
+                    <button type="button" class="btn btn-danger" onclick="popup.hidefaqPopup();">Close</button>
+                  </div>
+              </div>
+            </div>
 
               <!-- Footer -->
               <footer class="sticky-footer bg-white">

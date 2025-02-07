@@ -12,7 +12,7 @@ import json
 import plotly
 import plotly.express as px
 import pandas as pd
-from flask import Blueprint, render_template, request,jsonify
+from flask import Blueprint, render_template, request, jsonify
 from app.database.controllers import Database
 import plotly.graph_objects as go
 
@@ -40,11 +40,19 @@ def home():
         "top_items_plot_data": generate_top_px_items_barchart_data(),
         "pct_list": pcts,
         "pct_data": selected_pct_data,
-        "total_spend_plot_data": generate_tot_spend_per_area_barchart_data()
+        "total_spend_plot_data": generate_tot_spend_per_area_barchart_data(),
+        "total_quantity": db_mod.get_max_qantity_name_percent()[1],
+        "top_drug_amount": db_mod.get_max_qantity_name_percent()[2],
+        "top_over_total_percent": round((db_mod.get_max_qantity_name_percent()[2])/ (db_mod.get_max_qantity_name_percent()[1])  * 100,2),     
+        "infection_treatment_plot_data": generate_infection_treatment_barchart_data(),
+        "top_5_antidepressant_data": generate_top_5_antidepressants_barchart_data()
     }
-    
+      
+
+
     # render the HTML page passing in relevant data
     return render_template('dashboard/index.html',dashboard_data=dashboard_data)
+    
 
 def generate_data_for_tiles():
     """Generate the data for the four home page tiles."""
@@ -58,7 +66,11 @@ def generate_data_for_tiles():
         "total_spend_drugs": db_mod.get_total_spend_drugs(),
         "unique_items": db_mod.get_unique_items(),
         "total_gp_practice": db_mod.get_total_gp_practice(),
-     
+        "top_quant_drug_name":db_mod.get_max_qantity_name_percent()[0],
+        "total_quantity": db_mod.get_max_qantity_name_percent()[1],
+        "top_drug_amount": db_mod.get_max_qantity_name_percent()[2],
+       
+    
     }
     return tile_data
 
@@ -116,3 +128,66 @@ def generate_tot_spend_per_area_barchart_data():
         'description': description
     }
     return plot_data
+
+
+def generate_infection_treatment_barchart_data():
+    infection_data = db_mod.get_infection_treatment_barchart()
+    categories = [item[0] for item in infection_data]
+    percentages = [item[1] for item in infection_data]
+
+    plot_data = [{
+        "x": categories,
+        "y": percentages,
+        "type": "bar",
+        "name": "Infection Treatments"
+    }]
+
+    layout = {
+        "yaxis": {
+            "title": "Percentage (%)",
+            "range": [0, 100]
+        },
+        "xaxis": {
+            "title": "Drug Categories"
+        },
+    }
+
+    full_plot = {
+        "data": plot_data,
+        "layout": layout
+    }
+
+    return json.dumps(full_plot)
+
+def generate_top_5_antidepressants_barchart_data():
+    """Generate the data needed to populate the top 5 prescribed antidepressants across all PCTs."""
+
+    # Fetch data
+    top_names, top_quantities = db_mod.get_top_5_antidepressants()
+
+    # Create DataFrame
+    df = pd.DataFrame({
+        "chart_names": top_names,
+        "chart_quantities": top_quantities
+    })
+
+    # Sort data manually in descending order
+    df = df.sort_values(by="chart_quantities", ascending=False)
+
+    # Generate the plot
+    fig = px.bar(df, x="chart_names", y="chart_quantities",
+                 labels={"chart_names": "Medication", "chart_quantities": "Quantity"})
+
+    fig.update_xaxes(categoryorder="total descending")  # Ensure correct ordering
+
+    # Convert the plot to JSON
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return {
+        'graphJSON': graphJSON,
+        'header': "Top 5 Prescribed Antidepressants",
+        'description': "Top 5 prescribed antidepressants across all PCTs with their quantities."
+    }
+
+
+

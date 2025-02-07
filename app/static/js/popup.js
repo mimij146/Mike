@@ -15,6 +15,8 @@ function Popup()
     popup.aboutPopup = document.getElementById("about-box");
     popup.datasourcesPopup = document.getElementById("datasources-box");
     popup.bnfcodesPopup = document.getElementById("bnfcodes-box");
+    popup.faqPopup = document.getElementById("faq-box");
+
 
     // display the popup mask
     popup.showMask = function()
@@ -88,6 +90,21 @@ function Popup()
      {
          this.hideMask();
          this.bnfcodesPopup.style.display = "none";
+     }
+
+     // show the faq popup
+     popup.showfaqPopup = function()
+     {
+         this.showMask();
+         this.faqPopup.style.display = "block";
+         this.positionDialogue(this.faqPopup);
+     }
+ 
+     // hide faq popup
+     popup.hidefaqPopup = function()
+     {
+         this.hideMask();
+         this.faqPopup.style.display = "none";
      }
  
     // position dialogue center screen

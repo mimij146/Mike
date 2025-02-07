@@ -89,7 +89,14 @@ class Database:
         result = db.session.execute(db.select(func.count(PracticeData.code))).scalar()
         return result
         
+    def get_max_qantity_name_percent(self):
+        """Return the drug name with the highest quantity prescribed and its percentage proportion of total drug quantities"""
+        total_quantity = int(db.session.query(func.sum(PrescribingData.quantity)).scalar())
+        #db.session.execute(db.select(func.sum(PrescribingData.quantity))).first()[0]
+        top_drug_name = db.session.query(PrescribingData.BNF_name).order_by((PrescribingData.quantity).desc()).first()
+        top_drug_amount = int(db.session.query(func.max(PrescribingData.quantity)).first()[0])
         
+        return top_drug_name, total_quantity, top_drug_amount
         
 
     def get_top_pct(self):
@@ -106,5 +113,60 @@ class Database:
         distinct_practice_count = result[1] if result else 0
 
         return most_recurring_PCT, distinct_practice_count
+
+
+    def get_infection_treatment_barchart(self):
+        total_items = db.session.query(
+            func.sum(PrescribingData.items)
+        ).filter(
+            PrescribingData.BNF_code.like('050%')
+        ).scalar()
+
+        categories = [
+            ('Antibacterials', '0501%'),
+            ('Antifungal', '0502%'),
+            ('Antiviral', '0503%'),
+            ('Antiprotozoal', '0504%'),
+            ('Anthelmintics', '0505%')
+        ]
+
+        results = []
+        for category, bnf_code in categories:
+            category_total = db.session.query(
+                func.sum(PrescribingData.items)
+            ).filter(
+                PrescribingData.BNF_code.like(bnf_code)
+            ).scalar()
+
+            percentage = (category_total / total_items * 100) if total_items else 0
+            results.append((category, round(percentage, 2)))
+
+        return results
+
+    def get_top_5_antidepressants(self):
+        """Returns the top 5 prescribed antidepressant names along with their quantities."""
+        subquery = db.session.query(
+            PrescribingData.BNF_name,
+            func.sum(PrescribingData.quantity).label('total_quantity')
+        ).filter(
+            PrescribingData.BNF_code.like('0403%'),
+            ~PrescribingData.BNF_name.like('Amitrip%')
+        ).group_by(PrescribingData.BNF_name).subquery()
+
+        result = db.session.query(subquery.c.BNF_name, subquery.c.total_quantity) \
+            .order_by(subquery.c.total_quantity.desc()) \
+            .limit(5).all()
+
+
+        # Extract names and quantities
+        BNF_names = [row.BNF_name for row in result]
+        quantities = [row.total_quantity for row in result]
+
+        return BNF_names, quantities
+
+
+
+
+
 
 db.session.execute

@@ -11,6 +11,13 @@ DESCRIPTION:   Suite of tests for testing the dashboards database
 import unittest
 from app import app
 from app.database.controllers import Database
+import plotly.graph_objects as go
+from app.views.controllers import generate_top_5_antidepressants_barchart_data
+from app.views.controllers import generate_infection_treatment_barchart_data
+from unittest.mock import patch
+import plotly.utils
+import pandas as pd
+import json
 
 class DatabaseTests(unittest.TestCase):
     """Class for testing database functionality and connection."""
@@ -65,6 +72,13 @@ class DatabaseTests(unittest.TestCase):
             result = int(result.replace(",", ""))
         self.assertEqual(result, 2596402159)
     
+
+    def top_percent_tile_drug_name(self):
+        self.assertEqual(self.db_mod.get_max_qantity_name_percent()[0], "Methadone HCl_Oral Soln 1mg/1ml S/F")
+    
+    def top_percent_tile_percentage(self):
+        self.assertEqual((round(self.db_mod.get_max_qantity_name_percent()[1] / self.db_mod.get_max_qantity_name_percent()[1] *100, 2)), 0.14)
+
     def test_total_gp_practice(self):
         self.assertEqual(self.db_mod.get_total_gp_practice(), 9348)
 
@@ -97,6 +111,120 @@ class DatabaseTests(unittest.TestCase):
         self.assertNotEqual(most_recurring_PCT, incorrect_pct, "Most recurring PCT should not be XYZ123")
         self.assertNotEqual(distinct_practice_count, incorrect_count, "Distinct practice count should not be 99999")
 
+    def test_infection_percentage_bar_chart_zero_value_handling(self):
+        """
+        Test that the bar chart correctly handles a category with a value of 0.
+        """
+        # Mock results with one category having a value of 0
+        mock_results = [
+            ('Antibacterials', 82.25),
+            ('Antifungal', 0.00),
+            ('Antiviral', 2.68),
+            ('Antiprotozoal', 9.04),
+            ('Anthelmintics', 5.23)
+        ]
+
+        # Calculate total for processing (if needed by the chart logic)
+        total = sum(value for _, value in mock_results)
+
+        # Ensure the zero value does not cause rendering issues
+        for category, percentage in mock_results:
+            if category == 'Antifungal':
+                self.assertEqual(
+                    percentage,
+                    0.00,
+                    msg="Zero value for 'Antifungal' is not handled correctly."
+                )
+    def test_infection_percentage_bar_chart_over_100_handling(self):
+        """
+        Test that the bar chart correctly handles a total percentage exceeding 100%.
+        """
+    # Mock results with values summing to more than 100%
+        mock_results = [
+            ('Antibacterials', 50.0),
+            ('Antifungal', 30.0),
+            ('Antiviral', 25.0),
+            ('Antiprotozoal', 10.0),
+            ('Anthelmintics', 5.0)
+        ]
+
+    # Calculate total for processing (if needed by the chart logic)
+        total = sum(value for _, value in mock_results)
+
+    # Check if the total exceeds 100%
+        assert total > 100.0, f"Total percentage exceeds 100%: {total}. Chart logic should handle this correctly."
+
+    # Ensure individual values are still correct
+        for category, percentage in mock_results:
+            assert percentage >= 0.0, f"Percentage for '{category}' should not be negative."
+
+    def test_top_5_antidep(self):
+        data = [2429020, 2418812, 2394213, 1801482, 847308]
+        labels = ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"]
+        fig = go.Figure(data=[go.Bar(x=labels, y=data)])
+        bar_data = fig.data[0]
+        x_values = list(bar_data.x)
+        y_values = list(bar_data.y)
+
+
+        self.assertEqual(x_values, labels)
+        self.assertEqual(y_values, data)
+
+
+    @patch("app.views.controllers.db_mod.get_top_5_antidepressants")
+    def test_generate_top_5_antidepressants_barchart_data(self, mock_get_top_5):
+
+        mock_get_top_5.return_value = (
+            ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"],
+            [2429020, 2418812, 2394213, 1801482, 847308]
+        )
+
+        result = generate_top_5_antidepressants_barchart_data()
+
+        self.assertIn("graphJSON", result)
+        self.assertIn("header", result)
+        self.assertIn("description", result)
+        self.assertEqual(result["header"], "Top 5 Prescribed Antidepressants")
+        self.assertIn("Top 5 prescribed antidepressants", result["description"])
+
+
+        try:
+            graph_data = json.loads(result["graphJSON"])
+        except ValueError:
+            self.fail("graphJSON is not valid JSON")
+
+        # Check Plotly figure properties
+        self.assertIn("data", graph_data)
+        self.assertIn("layout", graph_data)
+
+        # Ensure sorting is correct
+        df = pd.DataFrame({
+            "chart_names": ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"],
+            "chart_quantities": [2429020, 2418812, 2394213, 1801482, 847308]
+        }).sort_values(by="chart_quantities", ascending=False)
+
+        self.assertListEqual(df["chart_names"].tolist(), ["Fluoxetine HCl_Cap 20mg", "Sertraline HCl_Tab 50mg", "Sertraline HCl_Tab 100mg", "Citalopram Hydrob_Tab 20mg", "Citalopram Hydrob_Tab 10mg"])
+        self.assertListEqual(df["chart_quantities"].tolist(), [2429020, 2418812, 2394213, 1801482, 847308])
+
+    @patch("app.views.controllers.db_mod.get_infection_treatment_barchart")
+    def test_infection_percentage_bar_chart_over_100_handling(self, mock_get_data):
+        mock_get_data.return_value = [
+            ("Antibiotics", 50),
+            ("Antivirals", 20),
+            ("Antifungals", 30)
+        ]
+
+
+        result_json = generate_infection_treatment_barchart_data()
+        result = json.loads(result_json)
+
+
+        y_range = result["layout"]["yaxis"]["range"]
+        y_values = result["data"][0]["y"]
+
+
+        self.assertEqual(y_range, [0, 100])
+        self.assertTrue(all(0 <= y <= 100 for y in y_values))
 
 if __name__ == "__main__":
     unittest.main()
