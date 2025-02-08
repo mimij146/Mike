@@ -34,31 +34,30 @@
 
           $(document).ready(function () {
               initializeMain();
-              var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
-              Plotly.plot('chart',graphs,{});
+              var graphs = [
+                {{ dashboard_data.top_items_plot_data.graphJSON | safe }},  // chart0
+                {{ dashboard_data.total_spend_plot_data.graphJSON | safe }}   // chart1                
+              ];
+              graphs.forEach(function(graphData, index) {
+                Plotly.plot('chart'+index, graphData,{})
+            });  
           });
 
-       $(document).ready(function () {
-    initializeMain();
-
-    // Initialize Plotly chart
-    var graphs = {{ dashboard_data.top_items_plot_data.graphJSON | safe }};
-    Plotly.plot('chart', graphs, {});
-
-     var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
-    Plotly.plot('antidep_chart', antidep_graphs, {});
-
-});
-
-
+         $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
+         $(document).ready(function () {
+            initializeMain();
+      // Initialize Plotly chart
+            var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
+            Plotly.plot('antidep_chart', antidep_graphs, {});
+          });
     </script>
   </head>
 
   <body id="page-top">
-
-  <script>
+  
+  <script type=text/javascript>
     var antidep_graphs = {{ dashboard_data.top_5_antidepressant_data.graphJSON | safe }};
-</script>
+ </script>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -242,7 +241,9 @@
                           </div>
                           <div class="col">
                             <div class="progress progress-sm mr-2">
-                              <div class="progress-bar bg-info" role="progressbar" style="width:{{ dashboard_data.top_over_total_percent }}%" aria-valuemin="0" aria-valuemax="100"></div>
+                              <script type=text/javascript>
+                              <div class="progress-bar bg-info" role="progressbar" style="width:{{dashboard_data.top_over_total_percent}}%" aria-valuemin="0" aria-valuemax="100"></div>
+                              </script>
                             </div>
                           </div>
                         </div>
@@ -326,243 +327,246 @@
 
 
 
-            <!-- Content Row -->
-            <div class="row">
-              <div class="col-xl-6 col-lg-7">
-                <div class="card shadow mb-4">
-                  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_items_plot_data.header}}</h6>
+              <!-- Content Row -->
+          <div class="row">
+                <div class="col-xl-6 col-lg-7">
+                  <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_items_plot_data.header}}</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chart0" class="chart"></div>
+                      <p>{{dashboard_data.top_items_plot_data.description}}</p>                 
                   </div>
-                  <div class="card-body">
-                    <div id="chart" class="chart"></div>
-                    <p>{{dashboard_data.top_items_plot_data.description}}</p>                    
-                  </div>
+                 </div>
                 </div>
-              </div>
-
+                  <!-- Content Column -->
+                <div class="col-xl-6 col-lg-7">
                     <!-- Infection treatment drugs -->
-                <div class="card shadow mb-4">
+                 <div class="card shadow mb-4">
                   <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Infection treatment drug as % of all infection treatments</h6>
                   </div>
                   <div class="card-body">
-                  <div id="infection-treatments-chart" style="width:100%; height:400px;"></div>
-                  <script>
-                      var infectionTreatmentData = {{ dashboard_data.infection_treatment_plot_data | safe }};
-                      Plotly.newPlot('infection-treatments-chart', infectionTreatmentData);
-                  </script>
-                  </div>
-                </div>
+                      <div id="infection-treatments-chart" style="width:100%; height:400px;"></div>
+                      <script type=text/javascript>
+                        var infectionTreatmentData = {{dashboard_data.infection_treatment_plot_data | safe}};
+                        Plotly.newPlot('infection-treatments-chart', infectionTreatmentData);
+                      </script>
+                 </div>
+               </div>
+        </div>
+        <!-- ContentRow -->
+        <div class="row last-row">
+          <div class="col-xl-6 col-lg-7">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_5_antidepressant_data.header}}</h6>
               </div>
+              <div class="card-body" id="antidep_chart_container">
+                 <div id="antidep_chart"></div>
+                 <p>{{dashboard_data.top_5_antidepressant_data.description}}</p>
             </div>
-
-                <!-- Content Column -->
-               <div class="row last-row">
-                    <div class="col-xl-6 col-lg-7">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.top_5_antidepressant_data.header}}</h6>
-                                    </div>
-                                <div class="card-body" id="antidep_chart_container">
-                                    <div id="antidep_chart"></div>
-                                    <p>{{dashboard_data.top_5_antidepressant_data.description}}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-
-
-
-            <!-- Content Row -->
-
-              <div class="col-xl-6">
-                <!-- Show the BNF data for slected PCT -->
-                <div class="card shadow mb-4">
-                  <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">BNF data per PCT</h6>
-                  </div>
-                  <div class="card-body">
-                      <form method='POST' action="{{ url_for('dashboard.home') }}">
-                        <select class="custom-select" id="input-group-select" name="pct-option">
-                          {% for item in dashboard_data.pct_list %}
-                          <option name="option-list" value="{{ item }}">{{ item }}</option>
-                          {% endfor %}
-                        </select>
-                        <input type="submit" value="Update" class="btn btn-outline-secondary" />
-                      </form>
-                      <hr />
-                      <table class="table">
-                      <thead>
-                        <td>Practice</td>
-                        <td>BNF code</td>
-                        <td>BNF name</td>
-                        <td>Items</td>
-                      </thead>
-                        <tbody>
-                        {% for row in dashboard_data.pct_data %}
-                          <tr>
-                            <td>{{ row.practice }}</td>
-                            <td>{{ row.BNF_code }}</td>
-                            <td>{{ row.BNF_name }}</td>
-                            <td>{{ row.items }}</td>
-                          </tr>
-                        {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+           </div>
           </div>
-          
-            <!-- Creatinine clearance calculator -->
-            <div id="creat-calc">
-              <div class="card">
-                  <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Creatinine clearance calculator</h6>
-                  </div>
-                  <div class="card-body">
-                    <p>Sex of patient:</p>
-                    <div>
-                      <label class="radio-inline">
-                        <input type="radio" name="sex" value="m"> Male
-                      </label>
-                      <label class="radio-inline">
-                        <input type="radio" name="sex" value="f"> Female
-                      </label>
-                      <p>Age of patient (years):</p>
-                      <input type="number" min="1" max="120" name="patients-age" />
-                      <br /><br />
-                      <p>Weight of patient (kg):</p>
-                      <input type="number" min="1" max="120" name="patients-weight" />
-                      <br /><br />
-                      <p>Serum creatinine (micromol/L):</p>
-                      <input type="number" min="1" max="120" name="patients-serum" />
-                      <br />
-                    </div>
-                    <br />
-                    <hr />
-                    <button type="button" class="btn btn-primary">Calculate</button>
-                    <button type="button" class="btn btn-danger" onclick="popup.hideCeatCalcFormPopup();">Close</button>
-                  </div>
-                </div>
-            </div>
-
-            <!-- About popup -->
-            <div id="about-box">
-              <div class="card">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">About the prescribing dashboard</h6>
-                  </div>
-                  <div class="card-body">
-                    <p><strong>Developed by:</strong> Sara Salman Baladram, Stephanie Kayode, Chrizzia Dela, Violet Neumann, Mimi Jackson, Nairah Makame.
-                      <br> <br> <strong> Contact email:</strong> sara.baladram.24@ucl.ac.uk</p>
-                    <br />
-                    <hr />
-                    <button type="button" class="btn btn-danger" onclick="popup.hideAboutPopup();">Close</button>
-                  </div>
+            <!-- Content Column -->
+          <div class="col-xl-6 col-lg-7">
+            <div class="card shadow mb-4">
+              <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">{{dashboard_data.total_spend_plot_data.header}}</h6>
               </div>
+              <div class="card-body">
+                 <div id="chart1" class="chart"></div>
+                 <p>{{dashboard_data.total_spend_plot_data.description}}</p> 
+                </div>                   
             </div>
-
-              <!-- Data Sources popup -->
-              <div id="datasources-box"> 
-                <div class="card">
-                  <div class="card-header py-3">
-                      <h6 class="m-0 font-weight-bold text-primary">Data Sources</h6>
-                    </div>
-                    <div class="card-body">
-                      <p>Data source: NHS Digital: Practice Level Prescribiing in England.
-                        <br/>Provides a list of all medicines, dressings, and appliances that are prescribed by all practices in England.
-                        <br/>
-                        <br/> Last updated 01/10/2025 15:50                     
-                      </p>
-                      <br />
-                      <hr />
-                      <button type="button" class="btn btn-danger" onclick="popup.hidedatasourcesPopup();">Close</button>
-                    </div>
+         </div>
+              <!-- Content Column -->
+             <div class="col-xl-6 col-lg-7">
+                  <!-- Show the BNF data for slected PCT -->
+              <div class="card shadow mb-4">
+                <div class="card-header">
+                  <h6 class="m-0 font-weight-bold text-primary">BNF data per PCT</h6>
                 </div>
-              </div>
-
-              <!-- bnf codes popup -->
-              <div id="bnfcodes-box">
-                <div class="card">
-                  <div class="card-header py-3">
-                      <h6 class="m-0 font-weight-bold text-primary">BNF Codes Information</h6>
-                    </div>
-                    <div class="card-body">
-                      <p>The NHS Business Services Authority (BSA) prescribing and dispensing information systems use the therapeutic classifications defined in the British National Formulary (BNF) as extended by the BSA.
-                        <br/><br/>This is the BNF code structure for a drug:
-                        <ul>
-                          <li>Characters 1 and 2 show the BNF chapter</li>
-                          <li>Characters 3 and 4 show the BNF section</li>
-                          <li>Characters 5 and 6 show the BNF paragraph</li>
-                          <li>Character 7 shows the BNF sub-paragraph</li>
-                          <li>Characters 8 and 9 show the chemical substance</li>
-                          <li>Characters 10 and 11 show the product</li>
-                          <li>Characters 12 and 13 show the strength and formulation</li>
-                          <li>Characters 14 and 15 show the equivalent</li>
-                      </ul>
-                      For example:
-                      <style>
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            text-align: center;
-                            font-family: Arial, sans-serif;
-                            font-size: 12px;
-                        }
-                        th, td {
-                            border: 1px solid black;
-                            padding: 8px;
-                        }
-                        th {
-                            font-weight: bold;
-                        }
-                    </style>
-                      <table>
-                        <thead>
-                          <br/><tr>
-                                <th>Chapter</th>
-                                <th>Section</th>
-                                <th>Paragraph</th>
-                                <th>Sub para</th>
-                                <th>Chemical<br>substance</th>
-                                <th>Product</th>
-                                <th>Strength/<br>formulation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>04</td>
-                                <td>07</td>
-                                <td>02</td>
-                                <td>0</td>
-                                <td>40</td>
-                                <td>AA</td>
-                                <td>AM</td>
-                            </tr>
-                            <tr>
-                                <td>Central Nervous System</td>
-                                <td>Analgesics</td>
-                                <td>Opioid analgesics</td>
-                                <td>Opioid analgesics</td>
-                                <td>Tramadol hydrochloride</td>
-                                <td>Tramadol HCl</td>
-                                <td>Tramadol HCl_Tab 300mg MR</td>
-                            </tr>
-                        </tbody>
+                <div class="card-body">
+                    <form method='POST' action="{{ url_for('dashboard.home') }}">
+                      <select class="custom-select" id="input-group-select" name="pct-option">
+                        {% for item in dashboard_data.pct_list %}
+                        <option name="option-list" value="{{ item }}">{{ item }}</option>
+                        {% endfor %}
+                      </select>
+                      <input type="submit" value="Update" class="btn btn-outline-secondary" />
+                    </form>
+                    <hr />
+                    <table class="table">
+                    <thead>
+                      <td>Practice</td>
+                      <td>BNF code</td>
+                      <td>BNF name</td>
+                      <td>Items</td>
+                    </thead>
+                      <tbody>
+                      {% for row in dashboard_data.pct_data %}
+                        <tr>
+                          <td>{{ row.practice }}</td>
+                          <td>{{ row.BNF_code }}</td>
+                          <td>{{ row.BNF_name }}</td>
+                          <td>{{ row.items }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
                     </table>
-                      </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+            
+              <!-- Creatinine clearance calculator -->
+              <div id="creat-calc">
+                <div class="card">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">Creatinine clearance calculator</h6>
+                    </div>
+                    <div class="card-body">
+                      <p>Sex of patient:</p>
+                      <div>
+                        <label class="radio-inline">
+                          <input type="radio" name="sex" value="m"> Male
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" name="sex" value="f"> Female
+                        </label>
+                        <p>Age of patient (years):</p>
+                        <input type="number" min="1" max="120" name="patients-age" />
+                        <br /><br />
+                        <p>Weight of patient (kg):</p>
+                        <input type="number" min="1" max="120" name="patients-weight" />
+                        <br /><br />
+                        <p>Serum creatinine (micromol/L):</p>
+                        <input type="number" min="1" max="120" name="patients-serum" />
+                        <br />
+                      </div>
                       <br />
                       <hr />
-                      <button type="button" class="btn btn-danger" onclick="popup.hidebnfcodesPopup();">Close</button>
+                      <button type="button" class="btn btn-primary">Calculate</button>
+                      <button type="button" class="btn btn-danger" onclick="popup.hideCeatCalcFormPopup();">Close</button>
+                    </div>
+                  </div>
+              </div>
+
+              <!-- About popup -->
+              <div id="about-box">
+                <div class="card">
+                  <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">About the prescribing dashboard</h6>
+                    </div>
+                    <div class="card-body">
+                      <p><strong>Developed by:</strong> Sara Salman Baladram, Stephanie Kayode, Chrizzia Dela, Violet Neumann, Mimi Jackson, Nairah Makame.
+                        <br> <br> <strong> Contact email:</strong> sara.baladram.24@ucl.ac.uk</p>
+                      <br />
+                      <hr />
+                      <button type="button" class="btn btn-danger" onclick="popup.hideAboutPopup();">Close</button>
                     </div>
                 </div>
               </div>
 
+                <!-- Data Sources popup -->
+                <div id="datasources-box"> 
+                  <div class="card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Sources</h6>
+                      </div>
+                      <div class="card-body">
+                        <p>Data source: NHS Digital: Practice Level Prescribiing in England.
+                          <br/>Provides a list of all medicines, dressings, and appliances that are prescribed by all practices in England.
+                          <br/>
+                          <br/> Last updated 01/10/2025 15:50                     
+                        </p>
+                        <br />
+                        <hr />
+                        <button type="button" class="btn btn-danger" onclick="popup.hidedatasourcesPopup();">Close</button>
+                      </div>
+                  </div>
+                </div>
+
+                <!-- bnf codes popup -->
+                <div id="bnfcodes-box">
+                  <div class="card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">BNF Codes Information</h6>
+                      </div>
+                      <div class="card-body">
+                        <p>The NHS Business Services Authority (BSA) prescribing and dispensing information systems use the therapeutic classifications defined in the British National Formulary (BNF) as extended by the BSA.
+                          <br/><br/>This is the BNF code structure for a drug:
+                          <ul>
+                            <li>Characters 1 and 2 show the BNF chapter</li>
+                            <li>Characters 3 and 4 show the BNF section</li>
+                            <li>Characters 5 and 6 show the BNF paragraph</li>
+                            <li>Character 7 shows the BNF sub-paragraph</li>
+                            <li>Characters 8 and 9 show the chemical substance</li>
+                            <li>Characters 10 and 11 show the product</li>
+                            <li>Characters 12 and 13 show the strength and formulation</li>
+                            <li>Characters 14 and 15 show the equivalent</li>
+                        </ul>
+                        For example:
+                        <style>
+                          table {
+                              width: 100%;
+                              border-collapse: collapse;
+                              text-align: center;
+                              font-family: Arial, sans-serif;
+                              font-size: 12px;
+                          }
+                          th, td {
+                              border: 1px solid black;
+                              padding: 8px;
+                          }
+                          th {
+                              font-weight: bold;
+                          }
+                      </style>
+                        <table>
+                          <thead>
+                            <br/><tr>
+                                  <th>Chapter</th>
+                                  <th>Section</th>
+                                  <th>Paragraph</th>
+                                  <th>Sub para</th>
+                                  <th>Chemical<br>substance</th>
+                                  <th>Product</th>
+                                  <th>Strength/<br>formulation</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>04</td>
+                                  <td>07</td>
+                                  <td>02</td>
+                                  <td>0</td>
+                                  <td>40</td>
+                                  <td>AA</td>
+                                  <td>AM</td>
+                              </tr>
+                              <tr>
+                                  <td>Central Nervous System</td>
+                                  <td>Analgesics</td>
+                                  <td>Opioid analgesics</td>
+                                  <td>Opioid analgesics</td>
+                                  <td>Tramadol hydrochloride</td>
+                                  <td>Tramadol HCl</td>
+                                  <td>Tramadol HCl_Tab 300mg MR</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                        </p>
+                        <br />
+                        <hr />
+                        <button type="button" class="btn btn-danger" onclick="popup.hidebnfcodesPopup();">Close</button>
+                      </div>
+                  </div>
+                  
               <!-- faq popup -->
             <div id="faq-box">
               <div class="card">
@@ -586,38 +590,38 @@
               </div>
             </div>
 
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-              <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                  <span>Copyright &copy; Alan Davies 2024</span>
+              <!-- Footer -->
+              <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                  <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Alan Davies 2024</span>
+                  </div>
                 </div>
-              </div>
-            </footer>
-            <!-- End of Footer -->
+              </footer>
+              <!-- End of Footer -->
 
+            </div>
+            <!-- /.container-fluid -->
+    
           </div>
-          <!-- /.container-fluid -->
-  
+          <!-- End of Main Content -->
+
         </div>
-        <!-- End of Main Content -->
+        <!-- End of Content Wrapper -->
 
       </div>
-      <!-- End of Content Wrapper -->
+      <!-- End of Page Wrapper -->
 
-    </div>
-    <!-- End of Page Wrapper -->
+      <!-- Scroll to Top Button-->
+      <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+      </a>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-      <i class="fas fa-angle-up"></i>
-    </a>
+      <!-- Page mask -->
+      <div id="page-mask"></div>
 
-    <!-- Page mask -->
-    <div id="page-mask"></div>
+      <!-- Custom scripts for all pages-->
+      <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
 
-    <!-- Custom scripts for all pages-->
-    <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
-
-  </body>
-</html>
+    </body>
+  </html>

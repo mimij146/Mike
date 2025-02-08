@@ -14,6 +14,7 @@ import plotly.express as px
 import pandas as pd
 from flask import Blueprint, render_template, request, jsonify
 from app.database.controllers import Database
+import plotly.graph_objects as go
 
 views = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -39,13 +40,11 @@ def home():
         "top_items_plot_data": generate_top_px_items_barchart_data(),
         "pct_list": pcts,
         "pct_data": selected_pct_data,
-
+        "total_spend_plot_data": generate_tot_spend_per_area_barchart_data(),
         "total_quantity": db_mod.get_max_qantity_name_percent()[1],
         "top_drug_amount": db_mod.get_max_qantity_name_percent()[2],
         "top_over_total_percent": round((db_mod.get_max_qantity_name_percent()[2])/ (db_mod.get_max_qantity_name_percent()[1])  * 100,2),     
-
         "infection_treatment_plot_data": generate_infection_treatment_barchart_data(),
-
         "top_5_antidepressant_data": generate_top_5_antidepressants_barchart_data()
     }
       
@@ -101,8 +100,36 @@ def generate_top_px_items_barchart_data():
     }
     return plot_data
 
+def generate_tot_spend_per_area_barchart_data():
+    """Generate the data needed to populate the total spend per area barchart."""
+    
+    limit = 20
+    barchart_dict = db_mod.get_total_spend_per_area()
+    avg_spend = db_mod.get_total_avg_spend()
 
-import json
+    # Create a dataframe to store the database query results
+    df = pd.DataFrame({
+        "data_values": list(barchart_dict.values())[:limit],
+        "areas": list(barchart_dict.keys())[:limit],
+        "avg_spend": db_mod.get_total_avg_spend()
+    })
+    # Generate the plot
+    fig = px.bar(df, x="areas", y="data_values", 
+                 labels={"areas": "Area", 
+                         "data_values": "Spend on drugs (£)"}).update_xaxes(categoryorder="sum descending")
+    fig.add_hline(y = avg_spend, annotation_text = 'Total Average Spend', fillcolor = 'blue')
+    # Convert the plot for rendering and add any metadata (description/header)
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    header = "Spend on drugs per Area"
+    description = "Total spend (sum) on drugs per area."
+    plot_data = {
+        'graphJSON': graphJSON,
+        'header': header,
+        'description': description
+    }
+    return plot_data
+
+
 def generate_infection_treatment_barchart_data():
     infection_data = db_mod.get_infection_treatment_barchart()
     categories = [item[0] for item in infection_data]
@@ -161,5 +188,6 @@ def generate_top_5_antidepressants_barchart_data():
         'header': "Top 5 Prescribed Antidepressants",
         'description': "Top 5 prescribed antidepressants across all PCTs with their quantities."
     }
+
 
 

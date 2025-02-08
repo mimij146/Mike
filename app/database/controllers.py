@@ -9,15 +9,20 @@ DESCRIPTION:   Contains the Database class that contains all the methods used fo
 
 from sqlalchemy.sql import func
 from flask import Blueprint
-
 from app import db
 from app.database.models import PrescribingData, PracticeData
+from sqlalchemy import select
+import pandas as pd
+
+
 
 database = Blueprint('dbutils', __name__, url_prefix='/dbutils')
+
 
 class Database:
     """Class for managing database queries."""
     
+
     def convert_tuple_list_to_raw(self, tuple_list):
         """Helper function to convert results from tuple list to plain list."""
         order_row = [tuple(row) for row in tuple_list]
@@ -30,6 +35,25 @@ class Database:
     def get_prescribed_items_per_pct(self):
         """Return the total items per PCT."""
         result = db.session.execute(db.select(func.sum(PrescribingData.items).label('item_sum')).group_by(PrescribingData.PCT)).all()
+        return self.convert_tuple_list_to_raw(result)
+
+    def get_total_spend_per_area(self):
+        """Return total spend per area"""
+        result = db.session.query(PracticeData.area,(PrescribingData.items*PrescribingData.ACT_cost).label('total_spend')).join(PracticeData, PrescribingData.practice ==PracticeData.code)
+        processed = self.convert_tuple_list_to_raw(result)
+        dictionary = dict(zip(processed[0::2], processed[1::2]))
+        ordered_items = sorted(dictionary.items(), key=lambda item: item[1] if item[1] is not None else float('-inf'), reverse=True)
+        sorted_dict = dict(ordered_items)
+        return sorted_dict
+    
+    def get_total_avg_spend(self):
+        """Return the total average spend."""
+        return round(db.session.execute(func.avg(PrescribingData.items * PrescribingData.ACT_cost)).first()[0],2)
+       
+    
+    def get_distinct_areas(self):
+        """Return the distinct Areas."""
+        result = db.session.execute(db.select(PracticeData.area).distinct()).all()
         return self.convert_tuple_list_to_raw(result)
 
     def get_distinct_pcts(self):
@@ -55,6 +79,7 @@ class Database:
         """"Returns total spend on drugs for all practices"""
         total_spend = int(db.session.execute(db.select(func.sum(PrescribingData.items * PrescribingData.ACT_cost))).first()[0])
         return f"{total_spend: ,}"
+   
     def get_unique_items(self):
         """Returns the number of unique items prescribed"""
         return len(db.session.execute(db.select(PrescribingData.BNF_code).distinct()).all())
