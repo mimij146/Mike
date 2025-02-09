@@ -39,7 +39,7 @@ class Database:
 
     def get_total_spend_per_area(self):
         """Return total spend per area"""
-        result = db.session.query(PracticeData.area,(PrescribingData.items*PrescribingData.ACT_cost).label('total_spend')).join(PracticeData, PrescribingData.practice ==PracticeData.code)
+        result = db.session.query(PracticeData.area,(PrescribingData.items*PrescribingData.ACT_cost).label('total_spend')).join(PracticeData, PrescribingData.practice ==PracticeData.code).group_by(PracticeData.area)
         processed = self.convert_tuple_list_to_raw(result)
         dictionary = dict(zip(processed[0::2], processed[1::2]))
         ordered_items = sorted(dictionary.items(), key=lambda item: item[1] if item[1] is not None else float('-inf'), reverse=True)
