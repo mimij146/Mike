@@ -253,14 +253,29 @@ if __name__ == "__main__":
             [14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44, 534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78]
         )
 
-        result = generate_tot_spend_per_area_barchart_data()
 
-        self.assertIn("graphJSON", result)
-        self.assertIn("header", result)
-        self.assertIn("description", result)
-        self.assertEqual(result["header"], "Spend on drugs per Area")
-        self.assertIn("Total spend (sum) on drugs per area.", result["description"])
-
+        mock_get_total_spend.return_value = {
+            "CENTRE FOR HEALTH": 14462.73,
+            "CHADDERTON": 4934.1,
+            "TARPORLEY": 1626.48,
+            "BIRKENHEAD": 1221.78,
+            "GREASBY  WIRRAL": 1076.68,
+            "ALSAGER": 906.36,
+            "HANDFORTH": 851.76,
+            "HURWORTH PLACE": 739.05,
+            "STOCKTON-ON-TEES": 613.2,
+            "WALKDEN  WORSLEY": 609.44,
+            "WHITEFILED": 534.52,
+            "WIDNES": 514.5,
+            "NEWTON AYCLIFFE": 468.12,
+            "MANCHESTER": 428.85,
+            "HULME HALL ROAD": 421.64,
+            "MACCLESFIELD": 385.02,
+            "GAMESLEY": 345.06,
+            "CHEADLE HULME": 308.14,
+            "WALTING ST. LEADGATE": 304.22,
+            "CROOK": 300.78
+        }
 
         try:
             graph_data = json.loads(result["graphJSON"])

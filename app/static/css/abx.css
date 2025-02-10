@@ -175,6 +175,35 @@
     opacity: 1;
 }
 
+#tooltip faq box
+.nav.link {
+    position:relative;
+    cursor:pointer
+}
+.hoverable {
+    cursor: pointer;
+}
+.nav-link[faq-tooltip]:hover::after {
+    content: attr(faq-tooltip);
+    position: absolute;
+    bottom: 25%;
+    left: 98%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-size: 12px;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.nav-link[faq-tooltip]:hover::after {
+    opacity: 1;
+}
 canvas {
     width: 100%;
     max-width: 600px;
