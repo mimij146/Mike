@@ -12,7 +12,8 @@ import unittest
 from app import app
 from app.database.controllers import Database
 import plotly.graph_objects as go
-from app.views.controllers import generate_top_5_antidepressants_barchart_data, generate_tot_spend_per_area_barchart_data
+from app.views.controllers import generate_top_5_antidepressants_barchart_data
+from app.views.controllers import generate_tot_spend_per_area_barchart_data
 from app.views.controllers import generate_infection_treatment_barchart_data
 from unittest.mock import patch
 import plotly.utils
@@ -60,7 +61,6 @@ class DatabaseTests(unittest.TestCase):
     def non_existing_db_function(self):
         """Te"""
         self.assertRaises(self.db_mod.not_existing(),NameError)
-    
     def test_unique_items(self):
         self.assertEqual(self.db_mod.get_unique_items(), 13935)
 
@@ -74,14 +74,10 @@ class DatabaseTests(unittest.TestCase):
         if isinstance(result, str):
             result = int(result.replace(",", ""))
         self.assertEqual(result, 2596402159)
-    
-
     def top_percent_tile_drug_name(self):
         self.assertEqual(self.db_mod.get_max_qantity_name_percent()[0], "Methadone HCl_Oral Soln 1mg/1ml S/F")
-    
     def top_percent_tile_percentage(self):
         self.assertEqual((round(self.db_mod.get_max_qantity_name_percent()[1] / self.db_mod.get_max_qantity_name_percent()[1] *100, 2)), 0.14)
-
     def test_total_gp_practice(self):
         self.assertEqual(self.db_mod.get_total_gp_practice(), 9348)
 
@@ -229,8 +225,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(y_range, [0, 100])
         self.assertTrue(all(0 <= y <= 100 for y in y_values))
 
-if __name__ == "__main__":
-    unittest.main()
+
 
     def test_total_spend(self):
         data = [14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44, 534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78]
@@ -244,27 +239,23 @@ if __name__ == "__main__":
         self.assertEqual(x_values, labels)
         self.assertEqual(y_values, data)
 
+    from app.views.controllers import generate_tot_spend_per_area_barchart_data
 
     @patch("app.views.controllers.db_mod.get_total_spend_per_area")
-    def test_generate_total_spend_barchart_data(self, mock_get_total_spend):
+    def test_generate_tot_spend_per_area_barchart_data(self, mock_get_total_spend):
 
-        mock_get_total_spend.return_value = (
-            ["CENTRE FOR HEALTH", "CHADDERTON", "TARPORLEY", "BIRKENHEAD", "GREASBY  WIRRAL", "ALSAGER", "HANDFORTH", "HURWORTH PLACE", "STOCKTON-ON-TEES", "WALKDEN  WORSLEY", "WHITEFILED", "WIDNES", "NEWTON AYCLIFFE", "MANCHESTER", "HULME HALL ROAD", "MACCLESFIELD", "GAMESLEY", "CHEADLE HULME", "WALTING ST. LEADGATE", "CROOK"],
-            [14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44, 534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78]
-        )
-
-
+        # Mock return value
         mock_get_total_spend.return_value = {
             "CENTRE FOR HEALTH": 14462.73,
             "CHADDERTON": 4934.1,
             "TARPORLEY": 1626.48,
             "BIRKENHEAD": 1221.78,
-            "GREASBY  WIRRAL": 1076.68,
+            "GREASBY WIRRAL": 1076.68,
             "ALSAGER": 906.36,
             "HANDFORTH": 851.76,
             "HURWORTH PLACE": 739.05,
             "STOCKTON-ON-TEES": 613.2,
-            "WALKDEN  WORSLEY": 609.44,
+            "WALKDEN WORSLEY": 609.44,
             "WHITEFILED": 534.52,
             "WIDNES": 514.5,
             "NEWTON AYCLIFFE": 468.12,
@@ -277,24 +268,36 @@ if __name__ == "__main__":
             "CROOK": 300.78
         }
 
+
+        result = generate_tot_spend_per_area_barchart_data()
+
         try:
             graph_data = json.loads(result["graphJSON"])
         except ValueError:
             self.fail("graphJSON is not valid JSON")
-
         # Check Plotly figure properties
         self.assertIn("data", graph_data)
         self.assertIn("layout", graph_data)
 
         # Ensure sorting is correct
         df = pd.DataFrame({
-            "chart_names":["CENTRE FOR HEALTH", "CHADDERTON", "TARPORLEY", "BIRKENHEAD", "GREASBY  WIRRAL", "ALSAGER", "HANDFORTH", "HURWORTH PLACE", "STOCKTON-ON-TEES", "WALKDEN  WORSLEY", "WHITEFILED", "WIDNES", "NEWTON AYCLIFFE", "MANCHESTER", "HULME HALL ROAD", "MACCLESFIELD", "GAMESLEY", "CHEADLE HULME", "WALTING ST. LEADGATE", "CROOK"],
-            "chart_quantities":[14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44, 534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78]
+            "chart_names": ["CENTRE FOR HEALTH", "CHADDERTON", "TARPORLEY", "BIRKENHEAD", "GREASBY WIRRAL", "ALSAGER",
+                            "HANDFORTH", "HURWORTH PLACE", "STOCKTON-ON-TEES", "WALKDEN WORSLEY", "WHITEFILED",
+                            "WIDNES", "NEWTON AYCLIFFE", "MANCHESTER", "HULME HALL ROAD", "MACCLESFIELD", "GAMESLEY",
+                            "CHEADLE HULME", "WALTING ST. LEADGATE", "CROOK"],
+            "chart_quantities": [14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44,
+                                 534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78]
         }).sort_values(by="chart_quantities", ascending=False)
 
-        self.assertListEqual(df["chart_names"].tolist(), ["CENTRE FOR HEALTH", "CHADDERTON", "TARPORLEY", "BIRKENHEAD", "GREASBY  WIRRAL", "ALSAGER", "HANDFORTH", "HURWORTH PLACE", "STOCKTON-ON-TEES", "WALKDEN  WORSLEY", "WHITEFILED", "WIDNES", "NEWTON AYCLIFFE", "MANCHESTER", "HULME HALL ROAD", "MACCLESFIELD", "GAMESLEY", "CHEADLE HULME", "WALTING ST. LEADGATE", "CROOK"])
-        self.assertListEqual(df["chart_quantities"].tolist(),[14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44, 534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78]
-)
-    
+        self.assertListEqual(df["chart_names"].tolist(),
+                             ["CENTRE FOR HEALTH", "CHADDERTON", "TARPORLEY", "BIRKENHEAD", "GREASBY WIRRAL", "ALSAGER",
+                              "HANDFORTH", "HURWORTH PLACE", "STOCKTON-ON-TEES", "WALKDEN WORSLEY", "WHITEFILED",
+                              "WIDNES", "NEWTON AYCLIFFE", "MANCHESTER", "HULME HALL ROAD", "MACCLESFIELD", "GAMESLEY",
+                              "CHEADLE HULME", "WALTING ST. LEADGATE", "CROOK"])
+        self.assertListEqual(df["chart_quantities"].tolist(),
+                             [14462.73, 4934.1, 1626.48, 1221.78, 1076.68, 906.36, 851.76, 739.05, 613.2, 609.44,
+                              534.52, 514.5, 468.12, 428.85, 421.64, 385.02, 345.06, 308.14, 304.22, 300.78])
+
+
 if __name__ == "__main__":
     unittest.main()
